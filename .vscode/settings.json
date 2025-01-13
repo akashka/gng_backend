@@ -1,0 +1,19 @@
+{
+  "search.exclude": {
+    "**/node_modules": true,
+    "dist/": true,
+    "built/": true,
+    "static/": true
+  },
+  "files.exclude": {
+    "**/node_modules": true,
+    "npm-debug.log*": true  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[json]": {
+    "editor.formatOnSave": false
+  },
+  "tailwindCSS.includeLanguages": {
+    "tsx": "tsx"
+  }
+}
