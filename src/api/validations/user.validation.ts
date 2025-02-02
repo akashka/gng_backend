@@ -9,7 +9,7 @@ const postPutBody = () => {
     email: requireEmail(),
     password: Joi.string().min(6).max(128).required(),
     name: Joi.string().max(128),
-    role: Joi.string().valid(User.roles)
+    role: Joi.string()
   };
 };
 
@@ -24,7 +24,7 @@ module.exports = {
       sort: Joi.string(),
       name: Joi.string(),
       email: Joi.string(),
-      role: Joi.string().valid(User.roles)
+      role: Joi.string()
     }
   },
 
@@ -49,7 +49,7 @@ module.exports = {
       email: Joi.string().email(),
       password: Joi.string().min(6).max(128),
       name: Joi.string().max(128),
-      role: Joi.string().valid(User.roles)
+      role: Joi.string()
     },
     params: {
       userId: Joi.string()

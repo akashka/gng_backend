@@ -1,15 +1,17 @@
 export {};
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const { mongo, env } = require('./vars');
+// import mongoose from "mongoose";
+import mongoose = require("mongoose");
 
 // set mongoose Promise to Bluebird
-mongoose.Promise = Promise;
+// mongoose.Promise = Promise;
 
 // Exit application on error
-mongoose.connection.on('error', (err: any) => {
-  console.error(`MongoDB connection error: ${err}`);
-  process.exit(-1);
-});
+// mongoose.connection.on('error', (err: any) => {
+//   console.error(`MongoDB connection error: ${err}`);
+//   process.exit(-1);
+// });
 
 // print mongoose logs in dev env
 if (env === 'development') {
@@ -22,13 +24,9 @@ if (env === 'development') {
  * @returns {object} Mongoose connection
  * @public
  */
-exports.connect = () => {
+// exports.connect = () => {
   mongoose.connect(
-    mongo.uri,
-    {
-      keepAlive: 1,
-      useNewUrlParser: true
-    }
+    mongo.uri
   );
-  return mongoose.connection;
-};
+  // return mongoose.connection;
+// };

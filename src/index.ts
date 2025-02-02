@@ -1,8 +1,9 @@
 const serverless = require('serverless-http'); // Netlify
+const mongoose = require('mongoose');
 
 // make bluebird default Promise
 Promise = require('bluebird'); // eslint-disable-line no-global-assign
-const { port, env, socketEnabled } = require('./config/vars');
+const { mongo, port, env, socketEnabled } = require('./config/vars');
 
 const http = require('http'); // to use HTTPS, use: require('https') and the "options" with key, cert below.
 // const https = require('spdy'); // for HTTP2
@@ -10,9 +11,12 @@ const fs = require('fs');
 const app = require('./config/express');
 const socket = require('./api/services/socket');
 
-const mongoose = require('./config/mongoose');
+// const mongoose = require('./config/mongoose');
 
-mongoose.connect(); // open mongoose connection
+// mongoose.connect(); // open mongoose connection
+mongoose.connect(
+  mongo.uri
+);
 
 // HTTPS options
 const options = {};
