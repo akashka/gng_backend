@@ -7,6 +7,7 @@ const authRoutes = require('./auth.route');
 const uploadRoutes = require('./upload.route');
 const teacherRoutes = require('./teacher.route');
 const questionsRoutes = require('./questions.route');
+const staticDataRoutes = require('./staticData.route');
 
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.use('/auth', authRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/teacher', teacherRoutes);
 router.use('/questions', questionsRoutes);
+router.use('/staticdata', staticDataRoutes);
 
 module.exports = router;
