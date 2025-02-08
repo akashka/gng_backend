@@ -6,6 +6,7 @@ const RefreshToken = require('../models/refreshToken.model');
 const moment = require('moment-timezone');
 import { apiJson, randomString } from '../../api/utils/Utils';
 import { sendEmail, welcomeEmail, forgotPasswordEmail, slackWebhook } from '../../api/utils/MsgUtils';
+import { sendSms, welcomeSms, forgotPasswordSms } from '../../api/utils/SmsUtils';
 const { SEC_ADMIN_EMAIL, JWT_EXPIRATION_MINUTES, slackEnabled, emailEnabled } = require('../../config/vars');
 
 /**
@@ -40,7 +41,8 @@ exports.register = async (req: Request, res: Response, next: NextFunction) => {
     }
     if (emailEnabled) {
       // for testing: it can only email to "authorized recipients" in Mailgun Account Settings.
-      // sendEmail(welcomeEmail({ name: user.name, email: user.email }));
+      sendEmail(welcomeEmail({ name: user.name, email: user.email }));
+      sendSms(welcomeSms({ name: user.name, phone: user.phone }));
     }
     return apiJson({ req, res, data });
   } catch (error) {
@@ -137,11 +139,12 @@ exports.forgotPassword = async (req: Request, res: Response, next: NextFunction)
       return next({ message: 'Invalid request' });
     }
     // user found => generate temp password, then email it to user:
-    const { name, email } = user;
+    const { name, email, phone } = user;
     const tempPass = randomString(10, 'abcdefghijklmnopqrstuvwxyz0123456789');
     user.tempPassword = tempPass;
     await user.save();
     sendEmail(forgotPasswordEmail({ name, email, tempPass }));
+    sendSms(forgotPasswordSms({ name, phone, tempPass }))
 
     return apiJson({ req, res, data: { status: 'OK' } });
   } catch (error) {

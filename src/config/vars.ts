@@ -26,6 +26,10 @@ module.exports = {
   EMAIL_MAILGUN_API_KEY: env.EMAIL_MAILGUN_API_KEY,
   EMAIL_MAILGUN_DOMAIN: env.EMAIL_MAILGUN_DOMAIN,
   SEC_ADMIN_EMAIL: env.SEC_ADMIN_EMAIL,
+  SMS_TWILIO_ACCOUNT_SID: env.SMS_TWILIO_ACCOUNT_SID,
+  SMS_TWILIO_AUTH_TOKEN: env.SMS_TWILIO_AUTH_TOKEN,
+  SMS_TWILIO_PHONE_NUMBER: env.SMS_TWILIO_PHONE_NUMBER,
+  SMS_TEMPLATE_BASEL: env.SMS_TEMPLATE_BASE,
   // setAdminToken: (admToken: string) => (adminToken = admToken),
   isAdmin: (user: any) => user && user.email === env.SEC_ADMIN_EMAIL,
   mongo: {

@@ -13,7 +13,7 @@ const { env, JWT_SECRET, JWT_EXPIRATION_MINUTES } = require('../../config/vars')
 /**
  * User Roles
  */
-const roles = ['user', 'admin'];
+const roles = ['user', 'admin', 'teacher', 'parent', 'student'];
 
 /**
  * User Schema

@@ -114,6 +114,7 @@
     "serverless-http": "^2.7.0",
     "socket.io": "^2.2.0",
     "spdy": "^4.0.2",
+    "twilio": "^5.4.3",
     "uuid": "^7.0.3"
   },
   "devDependencies": {

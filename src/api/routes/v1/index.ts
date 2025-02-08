@@ -8,6 +8,7 @@ const uploadRoutes = require('./upload.route');
 const teacherRoutes = require('./teacher.route');
 const questionsRoutes = require('./questions.route');
 const staticDataRoutes = require('./staticData.route');
+const feedbacksRoutes = require('./feedbacks.route');
 
 const router = express.Router();
 
@@ -30,5 +31,6 @@ router.use('/upload', uploadRoutes);
 router.use('/teacher', teacherRoutes);
 router.use('/questions', questionsRoutes);
 router.use('/staticdata', staticDataRoutes);
+router.use('/feedbacks', feedbacksRoutes);
 
 module.exports = router;
