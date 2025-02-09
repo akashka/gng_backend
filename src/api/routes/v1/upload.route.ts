@@ -19,6 +19,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fieldSize: `${UPLOAD_LIMIT}MB` } });
 
-router.route('/file').post(authorize(), upload.single('file'), controller.upload);
+router.route('/file').post(upload.single('file'), controller.upload);
 
 module.exports = router;

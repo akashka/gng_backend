@@ -5,6 +5,6 @@ const router = express.Router();
 const staticDataController = require('../../controllers/staticData.controller');
 
 router.route('/').get(staticDataController.getValue);
-router.route('/').post(authorize(ADMIN), staticDataController.upsertValue);
+router.route('/').post(staticDataController.upsertValue);
 
 module.exports = router;
