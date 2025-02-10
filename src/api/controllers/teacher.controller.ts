@@ -94,13 +94,42 @@ exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) 
  * Get list of teachers
  * @public
  */
-exports.listTeachers = async (req: Request, res: Response, next: NextFunction) => {
-  console.log('req', req);
+exports.listTeachers = async (
+  req: {
+    query: {
+      page?: 1 | undefined;
+      sortOptions: any;
+      searchQuery: any;
+      boards: any;
+      qualifications: any;
+      professions: any;
+      languages: any;
+      classes: any;
+      subjects: any;
+      timings: any;
+      days: any;
+    };
+  },
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    let teachers = await Teacher.list({
-      query: req.query
-    });
+    const {
+      page = 1,
+      sortOptions,
+      searchQuery,
+      boards,
+      qualifications,
+      professions,
+      languages,
+      classes,
+      subjects,
+      timings,
+      days
+    } = req.query;
 
+    // Step 1: Fetch all teachers
+    let teachers = await Teacher.find();
     teachers.map(
       async (t: {
         id: any;
@@ -124,7 +153,83 @@ exports.listTeachers = async (req: Request, res: Response, next: NextFunction) =
         delete t.status;
       }
     );
-    const transformedTeachers = teachers.map((teacher: { transform: () => any }) => teacher.transform());
+
+    teachers = teachers.filter((teacher: { isActive: Boolean }) => teacher.isActive === true);
+
+    // Step 2: Filter based on searchQuery
+    if (searchQuery) {
+      teachers = teachers.filter((teacher: { name: string }) =>
+        teacher.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Step 3: Apply additional filters
+    const filterTeachers = (teachers: any[], filterKey: string, filterValues: string[]) => {
+      if (filterValues) {
+        const filterArray = Array.isArray(filterValues) ? filterValues : [filterValues];
+        return teachers.filter((teacher) => filterArray.some((value) => teacher[filterKey].includes(value)));
+      }
+      return teachers;
+    };
+
+    teachers = filterTeachers(teachers, 'educationBoard', boards);
+    teachers = filterTeachers(teachers, 'highestQualification', qualifications);
+    teachers = filterTeachers(teachers, 'profession', professions);
+    teachers = filterTeachers(teachers, 'languagesKnown', languages);
+    teachers = filterTeachers(teachers, 'educationClass', classes);
+    teachers = filterTeachers(teachers, 'subjects', subjects);
+    teachers = filterTeachers(teachers, 'timeOfDay', timings);
+    teachers = filterTeachers(teachers, 'daysOfWeek', days);
+
+    // Step 4: Sort teachers
+    // To-Do: classesLength & prices needs to be added to be displayed
+    let sortKey = 'recommendationIndex';
+    let sortOrder = 'asc';
+    teachers.sort((a: any, b: any) => {
+      if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
+      if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    if (sortOptions) {
+      if (sortOptions === 'relevance') {
+        sortKey = 'recommendationIndex';
+        sortOrder = 'asc';
+      }
+      if (sortOptions === 'rating') {
+        sortKey = 'rating';
+        sortOrder = 'dec';
+      }
+      if (sortOptions === 'price_low') {
+        sortKey = 'prices';
+        sortOrder = 'asc';
+      }
+      if (sortOptions === 'price_high') {
+        sortKey = 'prices';
+        sortOrder = 'dec';
+      }
+      if (sortOptions === 'experience') {
+        sortKey = 'experienceInMonths';
+        sortOrder = 'dec';
+      }
+      if (sortOptions === 'availability') {
+        sortKey = 'classesLength';
+        sortOrder = 'dec';
+      }
+      teachers.sort((a: any, b: any) => {
+        if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
+        if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Step 5: Paginate results
+    const pageSize = 10;
+    const startIndex = (page - 1) * pageSize;
+    const paginatedTeachers = teachers.slice(startIndex, startIndex + pageSize);
+
+    // Step 6: Transform and return results
+    const transformedTeachers = paginatedTeachers.map((teacher: { transform: () => any }) => teacher.transform());
     res.json(transformedTeachers);
   } catch (error) {
     next(error);

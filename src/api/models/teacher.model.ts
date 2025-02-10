@@ -201,6 +201,16 @@ const teacherSchema = new mongoose.Schema(
         message: 'At least one education board must be specified'
       }
     },
+    educationClass: {
+      type: [String],
+      required: true,
+      validate: {
+        validator: function (value: string | any[]) {
+          return value.length >= 1;
+        },
+        message: 'At least one education class must be specified'
+      }
+    },
     subjects: {
       type: [String],
       required: true,
@@ -243,6 +253,11 @@ const teacherSchema = new mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true
+    },
+    recommendationIndex: {
+      type: Number,
+      required: true,
+      default: 0
     },
     Status: {
       type: String,
@@ -289,6 +304,7 @@ const ALLOWED_FIELDS = [
   'panCardNumber',
   'gstNumber',
   'educationBoard',
+  'educationClass',
   'subjects',
   'daysOfWeek',
   'timeOfDay',
@@ -301,7 +317,8 @@ const ALLOWED_FIELDS = [
   'isActive',
   'id',
   'rating',
-  'reviews'
+  'reviews',
+  'recommendationIndex'
 ];
 
 teacherSchema.method({
