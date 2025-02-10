@@ -37,7 +37,6 @@ const getAverageRating = (reviewsRatings: { rating: any }[]) => {
 };
 
 exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => {
-  console.log('req', req);
   try {
     let teacher = await Teacher.findById(req.params.teacherId);
     if (!teacher) {
@@ -96,6 +95,7 @@ exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) 
  * @public
  */
 exports.listTeachers = async (req: Request, res: Response, next: NextFunction) => {
+  console.log('req', req);
   try {
     let teachers = await Teacher.list({
       query: req.query
