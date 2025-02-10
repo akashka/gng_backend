@@ -7,8 +7,8 @@ const { omit } = require('lodash');
 import { apiJson } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
 const Teacher = require('../models/teacher.model');
+const ReviewsRatings = require('../models/reviewsRatings.model');
 const APIError = require('../utils/APIError');
-
 
 /**
  * Create new teacher
@@ -29,15 +29,34 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
  * Get teacher by ID
  * @public
  */
+
+const getAverageRating = (reviewsRatings: { rating: any }[]) => {
+  let total = 0;
+  reviewsRatings.map((r: { rating: any }) => (total += r.rating || 0));
+  return total;
+};
+
 exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const teacher = await Teacher.findById(req.params.teacherId);
+    let teacher = await Teacher.findById(req.params.teacherId);
     if (!teacher) {
       throw new APIError({
         message: 'Teacher not found',
-        status: httpStatus.NOT_FOUND,
+        status: httpStatus.NOT_FOUND
       });
     }
+    const reviewsRatings = await ReviewsRatings.find({ foreignId: teacher.id });
+    teacher.rating = getAverageRating(reviewsRatings);
+    teacher.reviews = reviewsRatings;
+
+    delete teacher.phone;
+    delete teacher.email;
+    delete teacher.aadhaarNumber;
+    delete teacher.panCardNumber;
+    delete teacher.gstNumber;
+    delete teacher.isActive;
+    delete teacher.status;
+
     res.json(teacher.transform());
   } catch (error) {
     next(error);
@@ -54,16 +73,16 @@ exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) 
     if (!teacher) {
       throw new APIError({
         message: 'Teacher not found',
-        status: httpStatus.NOT_FOUND,
+        status: httpStatus.NOT_FOUND
       });
     }
 
     // Remove fields that shouldn't be updated
     const updateData = omit(req.body, ['email', 'phone']); // Email and phone are unique fields
-    
+
     // Update fields
     Object.assign(teacher, updateData);
-    
+
     const savedTeacher = await teacher.save();
     res.json(savedTeacher.transform());
   } catch (error) {
@@ -77,11 +96,34 @@ exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) 
  */
 exports.listTeachers = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const teachers = await Teacher.list({
-      query: req.query,
+    let teachers = await Teacher.list({
+      query: req.query
     });
-    
-    const transformedTeachers = teachers.map((teacher: { transform: () => any; }) => teacher.transform());
+
+    teachers.map(
+      async (t: {
+        id: any;
+        rating: number;
+        phone: any;
+        email: any;
+        aadhaarNumber: any;
+        panCardNumber: any;
+        gstNumber: any;
+        isActive: any;
+        status: any;
+      }) => {
+        const reviewsRatings = await ReviewsRatings.find({ foreignId: t.id });
+        t.rating = getAverageRating(reviewsRatings);
+        delete t.phone;
+        delete t.email;
+        delete t.aadhaarNumber;
+        delete t.panCardNumber;
+        delete t.gstNumber;
+        delete t.isActive;
+        delete t.status;
+      }
+    );
+    const transformedTeachers = teachers.map((teacher: { transform: () => any }) => teacher.transform());
     res.json(transformedTeachers);
   } catch (error) {
     next(error);
@@ -92,13 +134,13 @@ exports.listTeachers = async (req: Request, res: Response, next: NextFunction) =
  * Deactivate teacher
  * @public
  */
-exports.deactivateTeacher = async (req: Request, res: Response, next: NextFunction)  => {
+exports.deactivateTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const teacher = await Teacher.findById(req.params.teacherId);
     if (!teacher) {
       throw new APIError({
         message: 'Teacher not found',
-        status: httpStatus.NOT_FOUND,
+        status: httpStatus.NOT_FOUND
       });
     }
 

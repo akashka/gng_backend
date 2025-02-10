@@ -9,6 +9,7 @@ const teacherRoutes = require('./teacher.route');
 const questionsRoutes = require('./questions.route');
 const staticDataRoutes = require('./staticData.route');
 const feedbacksRoutes = require('./feedbacks.route');
+const reviewsRatingsRoutes = require('./reviewsRatings.route');
 
 const router = express.Router();
 
@@ -32,5 +33,6 @@ router.use('/teacher', teacherRoutes);
 router.use('/questions', questionsRoutes);
 router.use('/staticdata', staticDataRoutes);
 router.use('/feedbacks', feedbacksRoutes);
+router.use('/reviewsratings', reviewsRatingsRoutes);
 
 module.exports = router;

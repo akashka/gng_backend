@@ -299,7 +299,9 @@ const ALLOWED_FIELDS = [
   'bankDetails.branchName',
   'bankDetails.accountType',
   'isActive',
-  'id'
+  'id',
+  'rating',
+  'reviews'
 ];
 
 teacherSchema.method({
