@@ -33,10 +33,11 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 const getAverageRating = (reviewsRatings: { rating: any }[]) => {
   let total = 0;
   reviewsRatings.map((r: { rating: any }) => (total += r.rating || 0));
-  return total;
+  return total / reviewsRatings.length;
 };
 
 exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => {
+  console.log('req', req);
   try {
     let teacher = await Teacher.findById(req.params.teacherId);
     if (!teacher) {
