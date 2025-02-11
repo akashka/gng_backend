@@ -63,7 +63,6 @@ const teacherSchema = new mongoose.Schema(
     },
     dob: {
       type: Date,
-      required: [true, 'Date of birth is required'],
       validate: {
         validator: function (value: string | number | Date) {
           const today = new Date();
@@ -111,24 +110,20 @@ const teacherSchema = new mongoose.Schema(
     },
     profession: {
       type: String,
-      required: [true, 'Profession is required'],
       trim: true
     },
     highestQualification: {
       type: String,
-      required: [true, 'Highest qualification is required'],
       trim: true
     },
     experienceInMonths: {
       type: Number,
-      required: true,
       default: 0,
       min: [0, 'Experience cannot be negative'],
       max: [300, 'Experience cannot exceed 300 months']
     },
     languagesKnown: {
       type: [String],
-      required: true,
       validate: {
         validator: function (value: string | any[]) {
           return value.length >= 1;
@@ -158,7 +153,6 @@ const teacherSchema = new mongoose.Schema(
     },
     aadhaarNumber: {
       type: String,
-      required: true,
       trim: true,
       validate: {
         validator: function (value: string) {
@@ -169,7 +163,6 @@ const teacherSchema = new mongoose.Schema(
     },
     panCardNumber: {
       type: String,
-      required: true,
       trim: true,
       uppercase: true,
       validate: {
@@ -193,7 +186,6 @@ const teacherSchema = new mongoose.Schema(
     },
     educationBoard: {
       type: [String],
-      required: true,
       validate: {
         validator: function (value: string | any[]) {
           return value.length >= 1;
@@ -203,7 +195,6 @@ const teacherSchema = new mongoose.Schema(
     },
     educationClass: {
       type: [String],
-      required: true,
       validate: {
         validator: function (value: string | any[]) {
           return value.length >= 1;
@@ -213,7 +204,6 @@ const teacherSchema = new mongoose.Schema(
     },
     subjects: {
       type: [String],
-      required: true,
       validate: {
         validator: function (value: string | any[]) {
           return value.length >= 1;
@@ -223,7 +213,6 @@ const teacherSchema = new mongoose.Schema(
     },
     daysOfWeek: {
       type: [String],
-      required: true,
       validate: {
         validator: function (value: any[]) {
           return (
@@ -238,7 +227,6 @@ const teacherSchema = new mongoose.Schema(
     },
     timeOfDay: {
       type: [String],
-      required: true,
       validate: {
         validator: function (value: string | any[]) {
           return value.length >= 1;
@@ -247,20 +235,21 @@ const teacherSchema = new mongoose.Schema(
       }
     },
     bankDetails: {
-      type: teacherBankDetailsSchema,
-      required: true
+      type: teacherBankDetailsSchema
     },
     isActive: {
       type: Boolean,
-      default: true
+      default: true,
+      required: true
     },
     recommendationIndex: {
       type: Number,
       required: true,
       default: 0
     },
-    Status: {
+    status: {
       type: String,
+      required: true,
       default: 'signedup',
       enum: [
         'signedup',
@@ -318,7 +307,8 @@ const ALLOWED_FIELDS = [
   'id',
   'rating',
   'reviews',
-  'recommendationIndex'
+  'recommendationIndex',
+  'status'
 ];
 
 teacherSchema.method({

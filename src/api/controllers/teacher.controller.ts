@@ -69,6 +69,8 @@ exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => 
  */
 exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('req.params', req.params);
+    console.log('req.body', req.body);
     const teacher = await Teacher.findById(req.params.teacherId);
     if (!teacher) {
       throw new APIError({
@@ -80,8 +82,12 @@ exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) 
     // Remove fields that shouldn't be updated
     const updateData = omit(req.body, ['email', 'phone']); // Email and phone are unique fields
 
-    // Update fields
-    Object.assign(teacher, updateData);
+    // Update only the fields present in the request body
+    for (const key in updateData) {
+      if (updateData.hasOwnProperty(key)) {
+        teacher[key] = updateData[key];
+      }
+    }
 
     const savedTeacher = await teacher.save();
     res.json(savedTeacher.transform());
