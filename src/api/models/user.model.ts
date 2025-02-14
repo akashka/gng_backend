@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
-const ALLOWED_FIELDS = ['id', 'name', 'email', 'picture', 'role', 'createdAt'];
+const ALLOWED_FIELDS = ['id', 'name', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName'];
 
 /**
  * Add your

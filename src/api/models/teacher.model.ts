@@ -262,6 +262,9 @@ const teacherSchema = new mongoose.Schema(
         'PhotosUploaded',
         'Onboarded'
       ]
+    },
+    demoVideo: {
+      type: String
     }
   },
   {
@@ -308,7 +311,8 @@ const ALLOWED_FIELDS = [
   'rating',
   'reviews',
   'recommendationIndex',
-  'status'
+  'status',
+  'demoVideo'
 ];
 
 teacherSchema.method({
