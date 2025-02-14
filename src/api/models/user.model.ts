@@ -60,6 +60,14 @@ const userSchema = new mongoose.Schema(
     picture: {
       type: String,
       trim: true
+    },
+    userRole: {
+      type: String,
+      enum: roles,
+      default: 'student'
+    },
+    userName: {
+      type: String
     }
   },
   {
