@@ -33,8 +33,7 @@ const generateEducationalContent = async (
     }
 
     // Claude API configuration
-    const CLAUDE_API_KEY =
-      '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';
+    const CLAUDE_API_KEY = '';
     const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 
     // Construct the prompt for Claude
