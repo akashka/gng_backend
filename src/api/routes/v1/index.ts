@@ -6,11 +6,14 @@ const userRoutes = require('./user.route');
 const authRoutes = require('./auth.route');
 const uploadRoutes = require('./upload.route');
 const teacherRoutes = require('./teacher.route');
+const parentRoutes = require('./parent.route');
+const studentRoutes = require('./student.route');
 const questionsRoutes = require('./questions.route');
 const staticDataRoutes = require('./staticData.route');
 const feedbacksRoutes = require('./feedbacks.route');
 const reviewsRatingsRoutes = require('./reviewsRatings.route');
 const teacherMappingRoutes = require('./teacherMapping.route');
+const resourcesRoutes = require('./resources.route');
 
 const router = express.Router();
 
@@ -31,10 +34,13 @@ router.use('/users', userRoutes);
 router.use('/auth', authRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/teacher', teacherRoutes);
+router.use('/parent', parentRoutes);
+router.use('/student', studentRoutes);
 router.use('/questions', questionsRoutes);
 router.use('/staticdata', staticDataRoutes);
 router.use('/feedbacks', feedbacksRoutes);
 router.use('/reviewsratings', reviewsRatingsRoutes);
 router.use('/teachermapping', teacherMappingRoutes);
+router.use('/resources', resourcesRoutes);
 
 module.exports = router;

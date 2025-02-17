@@ -8,6 +8,7 @@ const jwt = require('jwt-simple');
 const uuidv4 = require('uuid/v4');
 const APIError = require('../../api/utils/APIError');
 import { transformData, listData } from '../../api/utils/ModelUtils';
+import { required } from 'joi';
 const { env, JWT_SECRET, JWT_EXPIRATION_MINUTES } = require('../../config/vars');
 
 /**
@@ -24,15 +25,11 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       match: /^\S+@\S+\.\S+$/,
-      required: true,
-      unique: true,
       trim: true,
-      lowercase: true,
-      index: { unique: true }
+      lowercase: true
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
       maxlength: 128
     },
@@ -42,20 +39,9 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       maxlength: 128
     },
-    name: {
-      type: String,
-      maxlength: 128,
-      index: true,
-      trim: true
-    },
     services: {
       facebook: String,
       google: String
-    },
-    role: {
-      type: String,
-      enum: roles,
-      default: 'user'
     },
     picture: {
       type: String,
@@ -67,14 +53,22 @@ const userSchema = new mongoose.Schema(
       default: 'student'
     },
     userName: {
-      type: String
+      type: String,
+      maxlength: 128,
+      index: true,
+      trim: true
+    },
+    isActive: {
+      type: Boolean,
+      required: true,
+      default: true
     }
   },
   {
     timestamps: true
   }
 );
-const ALLOWED_FIELDS = ['id', 'name', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName'];
+const ALLOWED_FIELDS = ['id', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName', 'isActive'];
 
 /**
  * Add your

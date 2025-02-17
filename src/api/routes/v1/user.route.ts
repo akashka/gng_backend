@@ -182,4 +182,8 @@ router
    */
   .delete(authorize(LOGGED_USER), controller.remove);
 
+// router
+//   .route('/parentRegister')
+//   .post( controller.parentRegister);
+
 module.exports = router;

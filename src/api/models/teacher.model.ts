@@ -265,6 +265,11 @@ const teacherSchema = new mongoose.Schema(
     },
     demoVideo: {
       type: String
+    },
+    userId: {
+      type: String,
+      required: true,
+      ref: 'User'
     }
   },
   {
@@ -312,7 +317,8 @@ const ALLOWED_FIELDS = [
   'reviews',
   'recommendationIndex',
   'status',
-  'demoVideo'
+  'demoVideo',
+  'userId'
 ];
 
 teacherSchema.method({
