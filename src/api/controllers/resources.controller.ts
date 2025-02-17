@@ -34,7 +34,7 @@ const generateEducationalContent = async (
 
     // Claude API configuration
     const CLAUDE_API_KEY = '';
-    const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
+    const CLAUDE_API_URL = '';
 
     // Construct the prompt for Claude
     const prompt = `Can you generate a nice educational content for ${educationalSubject} subject ${educationalBoard} board India for class ${educationalClass} on the topic ${educationalTopic}. This has to be like educational content which kids when sees or read can understand the topic. Use images, videos, and text and keep it nice trendy readable fun interactive. No limit on content length take your own space. Use audio text videos animations. I WANT THE COMPLETE DATA IN THE HTML SYNTAX SO THAT I CAN JUST DANGEROUSLY RENDER IT WITHIN MY REACT NATIVE CODE FOR THE USER.
