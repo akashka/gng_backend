@@ -20,7 +20,7 @@ const getValue = async (req: Request, res: Response, next: NextFunction) => {
 
       return res.status(200).json({
         success: true,
-        value: data.value
+        value: data
       });
     }
 
