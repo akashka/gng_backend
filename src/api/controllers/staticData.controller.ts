@@ -53,7 +53,7 @@ const getValue = async (req: Request, res: Response, next: NextFunction) => {
 const upsertValue = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name } = req.query;
-    const { value } = req.body;
+    const { value, type, isActive } = req.body;
 
     if (!name || value === undefined) {
       return res.status(400).json({
@@ -68,7 +68,7 @@ const upsertValue = async (req: Request, res: Response, next: NextFunction) => {
     let result;
     if (existingEntry) {
       // Update existing entry
-      result = await StaticData.findOneAndUpdate({ name }, { value }, { new: true });
+      result = await StaticData.findOneAndUpdate({ name }, { value }, { type }, { isActive }, { new: true });
 
       return res.status(200).json({
         success: true,
