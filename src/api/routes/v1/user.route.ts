@@ -12,15 +12,15 @@ const router = express.Router();
  */
 router.param('userId', controller.load);
 
-router.route('/').get(validate(listUsers), controller.list).post(validate(createUser), controller.create);
+router.route('/').get(controller.list).post(controller.create);
 
 router.route('/profile').get(controller.loggedIn);
 
 router
   .route('/:userId')
   .get(controller.get)
-  .put(validate(replaceUser), controller.replace)
-  .patch(authorize(LOGGED_USER), validate(updateUser), controller.update)
+  .put(controller.replace)
+  .patch(authorize(LOGGED_USER), controller.update)
   .delete(authorize(LOGGED_USER), controller.remove);
 
 module.exports = router;
