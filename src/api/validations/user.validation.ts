@@ -5,18 +5,18 @@ import { User } from '../../api/models';
 const requireEmail = () => Joi.string().email().required();
 
 const postPutBody = () => {
-  return {
+  return Joi.object({
     email: requireEmail(),
     password: Joi.string().min(6).max(128).required(),
     name: Joi.string().max(128),
     role: Joi.string()
-  };
+  });
 };
 
 module.exports = {
   // GET /v1/users
   listUsers: {
-    query: {
+    query: Joi.object({
       limit: Joi.number().min(1).max(9999),
       offset: Joi.number().min(0),
       page: Joi.number().min(0),
@@ -25,7 +25,7 @@ module.exports = {
       name: Joi.string(),
       email: Joi.string(),
       role: Joi.string()
-    }
+    })
   },
 
   // POST /v1/users
@@ -36,25 +36,25 @@ module.exports = {
   // PUT /v1/users/:userId
   replaceUser: {
     body: postPutBody(),
-    params: {
+    params: Joi.object({
       userId: Joi.string()
         .regex(/^[a-fA-F0-9]{24}$/)
         .required()
-    }
+    })
   },
 
   // PATCH /v1/users/:userId
   updateUser: {
-    body: {
+    body: Joi.object({
       email: Joi.string().email(),
       password: Joi.string().min(6).max(128),
       name: Joi.string().max(128),
       role: Joi.string()
-    },
-    params: {
+    }),
+    params: Joi.object({
       userId: Joi.string()
         .regex(/^[a-fA-F0-9]{24}$/)
         .required()
-    }
+    })
   }
 };
