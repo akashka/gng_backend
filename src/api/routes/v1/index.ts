@@ -14,6 +14,7 @@ const feedbacksRoutes = require('./feedbacks.route');
 const reviewsRatingsRoutes = require('./reviewsRatings.route');
 const teacherMappingRoutes = require('./teacherMapping.route');
 const resourcesRoutes = require('./resources.route');
+const leadsRoutes = require('./leads.route');
 
 const router = express.Router();
 
@@ -42,5 +43,6 @@ router.use('/feedbacks', feedbacksRoutes);
 router.use('/reviewsratings', reviewsRatingsRoutes);
 router.use('/teachermapping', teacherMappingRoutes);
 router.use('/resources', resourcesRoutes);
+router.use('/leads', leadsRoutes);
 
 module.exports = router;
