@@ -68,8 +68,9 @@ exports.createStudent = async (req: Request, res: Response, next: NextFunction) 
       isActive: true
     });
 
-    const savedStudent = await student.save();
     const savedUser = await user.save();
+    student.userId = savedUser._id;
+    const savedStudent = await student.save();
     // To-Do: Send Mail & SMS to the parent about the login credentials
     // sendMailAndSms()
     res.status(httpStatus.CREATED);
