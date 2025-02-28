@@ -65,7 +65,8 @@ exports.createStudent = async (req: Request, res: Response, next: NextFunction) 
       picture: req.body.profileImage,
       userRole: 'student',
       userName: generateUserName(req.body),
-      isActive: true
+      isActive: true,
+      email: req.body.name?.trim() + '@test.com'
     });
 
     const savedUser = await user.save();
