@@ -62,13 +62,25 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       required: true,
       default: true
+    },
+    phone: {
+      type: String,
+      trim: true,
+      unique: true,
+      index: true,
+      validate: {
+        validator: function (value: string) {
+          return /^\d{10}$/.test(value);
+        },
+        message: 'Please enter a valid 10 digit phone number (e.g., 1234567890)'
+      }
     }
   },
   {
     timestamps: true
   }
 );
-const ALLOWED_FIELDS = ['id', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName', 'isActive'];
+const ALLOWED_FIELDS = ['id', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName', 'isActive', 'phone'];
 
 /**
  * Add your

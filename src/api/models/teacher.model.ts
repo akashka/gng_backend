@@ -103,9 +103,9 @@ const teacherSchema = new mongoose.Schema(
       index: true,
       validate: {
         validator: function (value: string) {
-          return /^\+\d{1,4}\d{10}$/.test(value);
+          return /^\d{10}$/.test(value);
         },
-        message: 'Please enter a valid phone number with country code (e.g., +911234567890)'
+        message: 'Please enter a valid 10 digit phone number (e.g., 1234567890)'
       }
     },
     profession: {

@@ -7,8 +7,12 @@ const { omit } = require('lodash');
 import { apiJson } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
 const Parent = require('../models/parent.model');
+const User = require('../models/user.model');
 const ReviewsRatings = require('../models/reviewsRatings.model');
 const APIError = require('../utils/APIError');
+const RefreshToken = require('../models/refreshToken.model');
+const moment = require('moment-timezone');
+const { SEC_ADMIN_EMAIL, JWT_EXPIRATION_MINUTES, slackEnabled, emailEnabled } = require('../../config/vars');
 
 /**
  * Create new parent
@@ -16,10 +20,100 @@ const APIError = require('../utils/APIError');
  */
 exports.createParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    let isUserFound = false;
+    if (req.body.email) {
+      const emailUser = await User.find({ email: req.body.email, isActive: true });
+      if (emailUser.length > 0) isUserFound = true;
+    }
+    if (req.body.phone) {
+      const emailPhone = await User.find({ email: req.body.phone, isActive: true });
+      if (emailPhone.length > 0) isUserFound = true;
+    }
+
+    if (isUserFound) {
+      throw new APIError({
+        message: 'Email or Phone Number already registered',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+    const sendOtp = req.body.sendOtp || false;
+    delete req.body.sendOtp;
     const parent = new Parent(req.body);
+    const user = new User({
+      password: Math.floor(100000 + Math.random() * 900000),
+      picture: req.body.profileImage,
+      userRole: 'parent',
+      isActive: req.body.isActive || true,
+      userName: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone
+    });
+
+    const savedUser = await user.save();
+    parent.userId = savedUser._id;
     const savedParent = await parent.save();
+    if (sendOtp) {
+      // To-Do: Send Mail & SMS to the parent OTP
+      // sendMailAndSms()
+    }
     res.status(httpStatus.CREATED);
     res.json(savedParent.transform());
+  } catch (error) {
+    next(error);
+  }
+};
+
+function generateTokenResponse(user: any, accessToken: string) {
+  const tokenType = 'Bearer';
+  const refreshToken = RefreshToken.generate(user).token;
+  const expiresIn = moment().add(JWT_EXPIRATION_MINUTES, 'minutes');
+  return {
+    tokenType,
+    accessToken,
+    refreshToken,
+    expiresIn
+  };
+}
+
+exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let notFound = true;
+    if (req.body.email) {
+      const emailUser = await User.find({ email: req.body.email, isActive: true });
+      if (emailUser.length > 0) notFound = false;
+    }
+    if (req.body.phone) {
+      const emailPhone = await User.find({ email: req.body.phone, isActive: true });
+      if (emailPhone.length > 0) notFound = false;
+    }
+
+    if (notFound) {
+      throw new APIError({
+        message: 'Email or Phone Number Not found or already registered',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+
+    const userFound = await User.findOne({ email: req.body.email, isActive: false, phone: req.body.phone });
+    const parentFound = await Parent.findOne({ email: req.body.email, isActive: false, phone: req.body.phone });
+    if (userFound && parentFound && userFound.password === req.body.otp) {
+      userFound.isActive = true;
+      userFound.password = '';
+      const savedUser = await userFound.save();
+      parentFound.isActive = true;
+      const savedParent = await parentFound.save();
+
+      const { user, accessToken } = await User.findAndGenerateToken(savedParent);
+      const token = generateTokenResponse(savedUser, accessToken);
+      const userTransformed = user.transform();
+      const data = { token, user: userTransformed };
+      return apiJson({ req, res, data });
+    } else {
+      throw new APIError({
+        message: 'OTP Mismatched or details not found',
+        status: httpStatus.NOT_FOUND
+      });
+    }
   } catch (error) {
     next(error);
   }
@@ -49,6 +143,36 @@ exports.getParent = async (req: Request, res: Response, next: NextFunction) => {
     parent.reviews = reviewsRatings;
 
     res.json(parent.transform());
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let notFound = true;
+    if (req.body.email) {
+      const emailUser = await User.find({ email: req.body.email });
+      if (emailUser.length > 0) notFound = false;
+    }
+    if (req.body.phone) {
+      const emailPhone = await User.find({ email: req.body.phone });
+      if (emailPhone.length > 0) notFound = false;
+    }
+
+    if (notFound) {
+      throw new APIError({
+        message: 'Email or Phone Number Not found or already registered',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+
+    const userFound = await User.findOne({ email: req.body.email, phone: req.body.phone });
+    const parentFound = await Parent.findOne({ email: req.body.email, phone: req.body.phone });
+
+    userFound.password = req.body.password;
+    const savedUser = await userFound.save();
+    res.json(savedUser.transform());
   } catch (error) {
     next(error);
   }
