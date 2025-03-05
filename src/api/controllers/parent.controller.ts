@@ -84,11 +84,10 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       emailUser,
       userFound;
     if (req.body.email) {
-      emailUser = await User.find({ email: req.body.email, isActive: false });
-      console.log('emailUser', JSON.stringify(emailUser));
+      emailUser = await User.find({ email: req.body.email, isActive: true });
     }
     if (req.body.phone) {
-      emailPhone = await User.find({ email: req.body.phone, isActive: false });
+      emailPhone = await User.find({ email: req.body.phone, isActive: true });
       console.log('emailPhone', JSON.stringify(emailPhone));
     }
 
@@ -100,6 +99,16 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
     }
 
     console.log('req.body', req.body);
+    emailUser = [];
+    emailPhone = [];
+    if (req.body.email) {
+      emailUser = await User.find({ email: req.body.email, isActive: false });
+      console.log('emailUser', JSON.stringify(emailUser));
+    }
+    if (req.body.phone) {
+      emailPhone = await User.find({ email: req.body.phone, isActive: false });
+      console.log('emailPhone', JSON.stringify(emailPhone));
+    }
 
     if (emailUser.length && emailPhone.length)
       userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
