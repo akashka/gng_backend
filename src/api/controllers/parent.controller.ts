@@ -43,12 +43,13 @@ exports.createParent = async (req: Request, res: Response, next: NextFunction) =
       password: Math.floor(100000 + Math.random() * 900000),
       picture: req.body.profileImage,
       userRole: 'parent',
-      isActive: req.body.isActive || true,
+      isActive: req.body.isActive ?? (sendOtp ? false : true),
       userName: req.body.name,
       email: req.body.email,
       phone: req.body.phone
     });
 
+    console.log('req.body.isActive', req.body.isActive);
     console.log('User', JSON.stringify(user));
 
     const savedUser = await user.save();
@@ -104,7 +105,7 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
     console.log('userFound', JSON.stringify(userFound));
     console.log('parentFound', JSON.stringify(parentFound));
 
-    console.log('userFound.password', JSON.stringify(userFound.password));
+    console.log('userFound.password', JSON.stringify(userFound?.password));
     console.log('req.body.otp', JSON.stringify(req.body.otp));
 
     if (userFound && parentFound && userFound.password === req.body.otp) {
