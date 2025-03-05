@@ -49,7 +49,7 @@ exports.createParent = async (req: Request, res: Response, next: NextFunction) =
       phone: req.body.phone
     });
 
-    console.log('req.body.isActive', req.body.isActive);
+    console.log('req.body', JSON.stringify(req.body));
     console.log('User', JSON.stringify(user));
 
     const savedUser = await user.save();
@@ -81,41 +81,44 @@ function generateTokenResponse(user: any, accessToken: string) {
 exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let notFound = true;
+    let emailUser = [];
+    let emailPhone = [];
+    let userFound = null;
     if (req.body.email) {
-      const emailUser = await User.find({ email: req.body.email, isActive: false });
-      if (emailUser.length > 0) notFound = false;
+      emailUser = await User.find({ email: req.body.email, isActive: false });
+      console.log('emailUser', JSON.stringify(emailUser));
     }
     if (req.body.phone) {
-      const emailPhone = await User.find({ email: req.body.phone, isActive: false });
-      if (emailPhone.length > 0) notFound = false;
+      emailPhone = await User.find({ email: req.body.phone, isActive: false });
+      console.log('emailPhone', JSON.stringify(emailPhone));
     }
 
-    console.log('notFound', JSON.stringify(notFound));
-
-    if (notFound) {
+    if (emailPhone.length > 0 || emailUser.length > 0) {
       throw new APIError({
         message: 'Email or Phone Number Not found or already registered',
         status: httpStatus.NOT_FOUND
       });
     }
 
-    const userFound = await User.findOne({ email: req.body.email, isActive: false, phone: req.body.phone });
-    const parentFound = await Parent.findOne({ email: req.body.email, isActive: false, phone: req.body.phone });
+    console.log('req.body', req.body);
 
+    if (emailUser.length && emailPhone.length)
+      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+    else if (emailUser.length) userFound = emailUser[0];
+    else if (emailPhone.length) userFound = emailPhone[0];
     console.log('userFound', JSON.stringify(userFound));
-    console.log('parentFound', JSON.stringify(parentFound));
 
-    console.log('userFound.password', JSON.stringify(userFound?.password));
-    console.log('req.body.otp', JSON.stringify(req.body.otp));
-
-    if (userFound && parentFound && userFound.password === req.body.otp) {
+    if (userFound && userFound.password === req.body.otp) {
       userFound.isActive = true;
       userFound.password = '';
       const savedUser = await userFound.save();
+
+      const parentFound = await Parent.findOne({ userId: userFound[0]._id });
+      console.log('parentFound', JSON.stringify(parentFound));
       parentFound.isActive = true;
       const savedParent = await parentFound.save();
 
-      const { user, accessToken } = await User.findAndGenerateToken(savedParent);
+      const { user, accessToken } = await User.findAndGenerateToken(savedUser);
       const token = generateTokenResponse(savedUser, accessToken);
       const userTransformed = user.transform();
 
