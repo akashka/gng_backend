@@ -49,6 +49,8 @@ exports.createParent = async (req: Request, res: Response, next: NextFunction) =
       phone: req.body.phone
     });
 
+    console.log('User', JSON.stringify(user));
+
     const savedUser = await user.save();
     parent.userId = savedUser._id;
     const savedParent = await parent.save();
