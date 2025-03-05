@@ -80,9 +80,8 @@ function generateTokenResponse(user: any, accessToken: string) {
 
 exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let notFound = true;
-    let emailUser = [];
-    let emailPhone = [];
+    let emailUser = null;
+    let emailPhone = null;
     let userFound = null;
     if (req.body.email) {
       emailUser = await User.find({ email: req.body.email, isActive: false });
