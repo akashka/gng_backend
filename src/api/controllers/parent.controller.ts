@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const httpStatus = require('http-status');
+const bcrypt = require('bcryptjs');
 const { omit } = require('lodash');
 import { apiJson } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
@@ -12,7 +13,7 @@ const ReviewsRatings = require('../models/reviewsRatings.model');
 const APIError = require('../utils/APIError');
 const RefreshToken = require('../models/refreshToken.model');
 const moment = require('moment-timezone');
-const { SEC_ADMIN_EMAIL, JWT_EXPIRATION_MINUTES, slackEnabled, emailEnabled } = require('../../config/vars');
+const { env, SEC_ADMIN_EMAIL, JWT_EXPIRATION_MINUTES, slackEnabled, emailEnabled } = require('../../config/vars');
 
 /**
  * Create new parent
@@ -116,7 +117,12 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
     else if (emailPhone.length) userFound = emailPhone[0];
     console.log('userFound', JSON.stringify(userFound));
 
-    if (userFound && userFound.password === req.body.otp) {
+    const rounds = env === 'test' ? 1 : 10;
+    const hash = await bcrypt.hash(req.body.otp, rounds);
+
+    console.log('----------------------------------------------------------------------');
+    console.log('hash', JSON.stringify(hash));
+    if (userFound && userFound.password === hash) {
       userFound.isActive = true;
       userFound.password = '';
       const savedUser = await userFound.save();
