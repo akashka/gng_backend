@@ -41,7 +41,7 @@ exports.createParent = async (req: Request, res: Response, next: NextFunction) =
     delete req.body.sendOtp;
     const parent = new Parent(req.body);
     const user = new User({
-      password: Math.floor(100000 + Math.random() * 900000),
+      otp: Math.floor(100000 + Math.random() * 900000),
       picture: req.body.profileImage,
       userRole: 'parent',
       isActive: req.body.isActive ?? (sendOtp ? false : true),
@@ -117,14 +117,9 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
     else if (emailPhone.length) userFound = emailPhone[0];
     console.log('userFound', JSON.stringify(userFound));
 
-    const rounds = env === 'test' ? 1 : 10;
-    const hash = await bcrypt.hash(req.body.otp, rounds);
-
-    console.log('----------------------------------------------------------------------');
-    console.log('hash', JSON.stringify(hash));
-    if (userFound && userFound.password === hash) {
+    if (userFound && userFound.otp === req.body.otp) {
       userFound.isActive = true;
-      userFound.password = '';
+      userFound.otp = '';
       const savedUser = await userFound.save();
 
       const parentFound = await Parent.findOne({ userId: userFound[0]._id });

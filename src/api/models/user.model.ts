@@ -74,6 +74,9 @@ const userSchema = new mongoose.Schema(
         },
         message: 'Please enter a valid 10 digit phone number (e.g., 1234567890)'
       }
+    },
+    otp: {
+      type: String
     }
   },
   {
