@@ -122,7 +122,7 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       userFound.otp = '';
       const savedUser = await userFound.save();
 
-      const parentFound = await Parent.findOne({ userId: userFound[0]._id });
+      const parentFound = await Parent.findOne({ userId: userFound._id });
       console.log('parentFound', JSON.stringify(parentFound));
       parentFound.isActive = true;
       const savedParent = await parentFound.save();
