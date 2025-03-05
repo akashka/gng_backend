@@ -82,11 +82,11 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
   try {
     let notFound = true;
     if (req.body.email) {
-      const emailUser = await User.find({ email: req.body.email, isActive: true });
+      const emailUser = await User.find({ email: req.body.email, isActive: false });
       if (emailUser.length > 0) notFound = false;
     }
     if (req.body.phone) {
-      const emailPhone = await User.find({ email: req.body.phone, isActive: true });
+      const emailPhone = await User.find({ email: req.body.phone, isActive: false });
       if (emailPhone.length > 0) notFound = false;
     }
 
