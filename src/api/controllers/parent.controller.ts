@@ -89,6 +89,8 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       if (emailPhone.length > 0) notFound = false;
     }
 
+    console.log('notFound', JSON.stringify(notFound));
+
     if (notFound) {
       throw new APIError({
         message: 'Email or Phone Number Not found or already registered',
@@ -98,6 +100,13 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
 
     const userFound = await User.findOne({ email: req.body.email, isActive: false, phone: req.body.phone });
     const parentFound = await Parent.findOne({ email: req.body.email, isActive: false, phone: req.body.phone });
+
+    console.log('userFound', JSON.stringify(userFound));
+    console.log('parentFound', JSON.stringify(parentFound));
+
+    console.log('userFound.password', JSON.stringify(userFound.password));
+    console.log('req.body.otp', JSON.stringify(req.body.otp));
+
     if (userFound && parentFound && userFound.password === req.body.otp) {
       userFound.isActive = true;
       userFound.password = '';
@@ -108,6 +117,10 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       const { user, accessToken } = await User.findAndGenerateToken(savedParent);
       const token = generateTokenResponse(savedUser, accessToken);
       const userTransformed = user.transform();
+
+      console.log('userTransformed', JSON.stringify(userTransformed));
+      console.log('token', JSON.stringify(token));
+
       const data = { token, user: userTransformed };
       return apiJson({ req, res, data });
     } else {
