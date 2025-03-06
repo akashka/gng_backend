@@ -10,6 +10,7 @@ const Teacher = require('../models/teacher.model');
 const User = require('../models/user.model');
 const ReviewsRatings = require('../models/reviewsRatings.model');
 const APIError = require('../utils/APIError');
+const { v4: uuidv4 } = require('uuid');
 
 /**
  * Create new teacher
@@ -38,6 +39,7 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
     delete req.body.sendOtp;
     const teacher = new Teacher(req.body);
     const user = new User({
+      uuid: uuidv4(),
       otp: Math.floor(100000 + Math.random() * 900000),
       picture: req.body.profileImage,
       userRole: 'teacher',
