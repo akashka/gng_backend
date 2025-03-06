@@ -38,8 +38,8 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
     const sendOtp = req.body.sendOtp || false;
     delete req.body.sendOtp;
     const teacher = new Teacher(req.body);
+    teacher.uuid = uuidv4();
     const user = new User({
-      uuid: uuidv4(),
       otp: Math.floor(100000 + Math.random() * 900000),
       picture: req.body.profileImage,
       userRole: 'teacher',
