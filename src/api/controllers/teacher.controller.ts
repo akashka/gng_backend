@@ -69,7 +69,9 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log('-------------------------------------------');
-    let emailPhone, emailUser, userFound;
+    let emailPhone: any[] = [],
+      emailUser,
+      userFound;
     if (req.body.email) {
       emailUser = await User.find({ email: req.body.email, isActive: true });
     }
