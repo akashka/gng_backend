@@ -69,9 +69,7 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log('-------------------------------------------');
-    let emailPhone: string | any[] = [],
-      emailUser,
-      userFound;
+    let emailPhone, emailUser, userFound;
     if (req.body.email) {
       emailUser = await User.find({ email: req.body.email, isActive: true });
     }
@@ -100,7 +98,9 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
     console.log('emailPhone', JSON.stringify(emailPhone));
     console.log('emailUser', JSON.stringify(emailUser));
     if (emailUser.length && emailPhone.length)
-      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+      userFound = emailUser.filter((obj1: { _id: any }) =>
+        emailPhone.some((obj2: { _id: any }) => obj2._id === obj1._id)
+      );
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
     console.log('userFound', JSON.stringify(userFound));
