@@ -109,8 +109,8 @@ exports.oAuth = async (req: any, res: Response, next: NextFunction) => {
 
 exports.directSignUp = async (req: any, res: Response, next: NextFunction) => {
   try {
+    let emailPhone: string | any[] = [];
     let emailUser = [];
-    let emailPhone = [];
     let userFound = null;
     if (req.body.email) {
       emailUser = await User.find({ email: req.body.email, isActive: true });
