@@ -135,13 +135,7 @@ const teacherSchema = new mongoose.Schema(
       max: [300, 'Experience cannot exceed 300 months']
     },
     languagesKnown: {
-      type: [String],
-      validate: {
-        validator: function (value: string | any[]) {
-          return value.length >= 1;
-        },
-        message: 'At least one language must be specified'
-      }
+      type: [String]
     },
     marksheetImage: {
       type: String,
@@ -197,54 +191,19 @@ const teacherSchema = new mongoose.Schema(
       }
     },
     educationBoard: {
-      type: [String],
-      validate: {
-        validator: function (value: string | any[]) {
-          return value.length >= 1;
-        },
-        message: 'At least one education board must be specified'
-      }
+      type: [String]
     },
     educationClass: {
-      type: [String],
-      validate: {
-        validator: function (value: string | any[]) {
-          return value.length >= 1;
-        },
-        message: 'At least one education class must be specified'
-      }
+      type: [String]
     },
     subjects: {
-      type: [String],
-      validate: {
-        validator: function (value: string | any[]) {
-          return value.length >= 1;
-        },
-        message: 'At least one subject must be specified'
-      }
+      type: [String]
     },
     daysOfWeek: {
-      type: [String],
-      validate: {
-        validator: function (value: any[]) {
-          return (
-            value.length >= 1 &&
-            value.every((day: string) =>
-              ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].includes(day.toLowerCase())
-            )
-          );
-        },
-        message: 'At least one valid day of week must be specified'
-      }
+      type: [String]
     },
     timeOfDay: {
-      type: [String],
-      validate: {
-        validator: function (value: string | any[]) {
-          return value.length >= 1;
-        },
-        message: 'At least one time slot must be specified'
-      }
+      type: [String]
     },
     bankDetails: {
       type: teacherBankDetailsSchema
