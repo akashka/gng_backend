@@ -116,7 +116,7 @@ exports.directSignUp = async (req: any, res: Response, next: NextFunction) => {
       emailUser = await User.find({ email: req.body.email, isActive: true });
     }
     if (req.body.phone) {
-      emailPhone = await User.find({ email: req.body.phone, isActive: true });
+      emailPhone = await User.find({ phone: req.body.phone, isActive: true });
     }
 
     if (emailUser.length && emailPhone.length)

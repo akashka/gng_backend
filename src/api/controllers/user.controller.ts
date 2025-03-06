@@ -124,7 +124,7 @@ exports.updatePassword = async (req: Request, res: Response, next: NextFunction)
       emailUser = await User.find({ email: req.body.email });
     }
     if (req.body.phone) {
-      emailPhone = await User.find({ email: req.body.phone });
+      emailPhone = await User.find({ phone: req.body.phone });
     }
 
     if (emailUser.length && emailPhone.length)

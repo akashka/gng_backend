@@ -27,7 +27,7 @@ exports.createParent = async (req: Request, res: Response, next: NextFunction) =
       if (emailUser.length > 0) isUserFound = true;
     }
     if (req.body.phone) {
-      const emailPhone = await User.find({ email: req.body.phone, isActive: true });
+      const emailPhone = await User.find({ phone: req.body.phone, isActive: true });
       if (emailPhone.length > 0) isUserFound = true;
     }
 
@@ -66,18 +66,6 @@ exports.createParent = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-function generateTokenResponse(user: any, accessToken: string) {
-  const tokenType = 'Bearer';
-  const refreshToken = RefreshToken.generate(user).token;
-  const expiresIn = moment().add(JWT_EXPIRATION_MINUTES, 'minutes');
-  return {
-    tokenType,
-    accessToken,
-    refreshToken,
-    expiresIn
-  };
-}
-
 exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let emailPhone: string | any[] = [],
@@ -87,7 +75,7 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       emailUser = await User.find({ email: req.body.email, isActive: true });
     }
     if (req.body.phone) {
-      emailPhone = await User.find({ email: req.body.phone, isActive: true });
+      emailPhone = await User.find({ phone: req.body.phone, isActive: true });
     }
 
     if (emailPhone.length > 0 || emailUser.length > 0) {
@@ -103,7 +91,7 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       emailUser = await User.find({ email: req.body.email, isActive: false });
     }
     if (req.body.phone) {
-      emailPhone = await User.find({ email: req.body.phone, isActive: false });
+      emailPhone = await User.find({ phone: req.body.phone, isActive: false });
     }
 
     if (emailUser.length && emailPhone.length)

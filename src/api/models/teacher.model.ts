@@ -49,6 +49,18 @@ const teacherBankDetailsSchema = new mongoose.Schema({
   }
 });
 
+const teacherexamDetailsSchema = new mongoose.Schema({
+  startedDatetime: {
+    type: Date
+  },
+  leftDatetime: {
+    type: Date
+  },
+  completedDatetime: {
+    type: Date
+  }
+});
+
 const teacherSchema = new mongoose.Schema(
   {
     name: {
@@ -270,6 +282,9 @@ const teacherSchema = new mongoose.Schema(
       type: String,
       required: true,
       ref: 'User'
+    },
+    examDetails: {
+      type: teacherexamDetailsSchema
     }
   },
   {
@@ -318,7 +333,8 @@ const ALLOWED_FIELDS = [
   'recommendationIndex',
   'status',
   'demoVideo',
-  'userId'
+  'userId',
+  'examDetails'
 ];
 
 teacherSchema.method({

@@ -7,6 +7,7 @@ const { omit } = require('lodash');
 import { apiJson } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
 const Teacher = require('../models/teacher.model');
+const User = require('../models/user.model');
 const ReviewsRatings = require('../models/reviewsRatings.model');
 const APIError = require('../utils/APIError');
 
@@ -16,9 +17,126 @@ const APIError = require('../utils/APIError');
  */
 exports.createTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    let isUserFound = false;
+    if (req.body.email) {
+      const emailUser = await User.find({ email: req.body.email, isActive: true });
+      if (emailUser.length > 0) isUserFound = true;
+    }
+    if (req.body.phone) {
+      const emailPhone = await User.find({ phone: req.body.phone, isActive: true });
+      if (emailPhone.length > 0) isUserFound = true;
+    }
+
+    if (isUserFound) {
+      throw new APIError({
+        message: 'Email or Phone Number already registered',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+
+    const sendOtp = req.body.sendOtp || false;
+    delete req.body.sendOtp;
     const teacher = new Teacher(req.body);
+    const user = new User({
+      otp: Math.floor(100000 + Math.random() * 900000),
+      picture: req.body.profileImage,
+      userRole: 'teacher',
+      isActive: req.body.isActive ?? (sendOtp ? false : true),
+      userName: req.body.name,
+      email: req.body.email,
+      phone: req.body.phone,
+      password: req.body.password
+    });
+
+    console.log('User', JSON.stringify(user));
+
+    const savedUser = await user.save();
+    teacher.userId = savedUser._id;
     const savedTeacher = await teacher.save();
+    if (sendOtp) {
+      // To-Do: Send Mail & SMS to the teacher OTP
+      // sendMailAndSms()
+    }
     res.status(httpStatus.CREATED);
+    res.json(savedTeacher.transform());
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let emailPhone: string | any[] = [],
+      emailUser,
+      userFound;
+    if (req.body.email) {
+      emailUser = await User.find({ email: req.body.email, isActive: true });
+    }
+    if (req.body.phone) {
+      emailPhone = await User.find({ phone: req.body.phone, isActive: true });
+    }
+
+    if (emailPhone.length > 0 || emailUser.length > 0) {
+      throw new APIError({
+        message: 'Email or Phone Number Not found or already registered',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+
+    emailUser = [];
+    emailPhone = [];
+    if (req.body.email) {
+      emailUser = await User.find({ email: req.body.email, isActive: false });
+    }
+    if (req.body.phone) {
+      emailPhone = await User.find({ phone: req.body.phone, isActive: false });
+    }
+
+    if (emailUser.length && emailPhone.length)
+      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+    else if (emailUser.length) userFound = emailUser[0];
+    else if (emailPhone.length) userFound = emailPhone[0];
+
+    if (userFound && userFound.otp === req.body.otp) {
+      userFound.isActive = true;
+      userFound.otp = '';
+      const savedUser = await userFound.save();
+
+      const teacherFound = await Teacher.findOne({ userId: userFound._id });
+      teacherFound.isActive = true;
+      const savedTeacher = await teacherFound.save();
+
+      res.status(httpStatus.CREATED);
+      res.json(savedTeacher.transform());
+    } else {
+      throw new APIError({
+        message: 'OTP Mismatched or details not found',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateTeacherStatus = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    if (!req.body.status) {
+      throw new APIError({
+        message: 'Status not found',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+    const teacher = await Teacher.findById(req.params.teacherId);
+    if (!teacher) {
+      throw new APIError({
+        message: 'Teacher not found',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+
+    teacher.status = req.body.status;
+    const savedTeacher = await teacher.save();
     res.json(savedTeacher.transform());
   } catch (error) {
     next(error);
@@ -29,11 +147,37 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
  * Get teacher by ID
  * @public
  */
-
 const getAverageRating = (reviewsRatings: { rating: any }[]) => {
   let total = 0;
   reviewsRatings.map((r: { rating: any }) => (total += r.rating || 0));
   return total / reviewsRatings.length;
+};
+
+exports.getTeacherByUserId = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let teacher = await Teacher.findOne({ userId: req.params.userId });
+    if (!teacher) {
+      throw new APIError({
+        message: 'Teacher not found',
+        status: httpStatus.NOT_FOUND
+      });
+    }
+    const reviewsRatings = await ReviewsRatings.find({ foreignId: teacher.id });
+    teacher.rating = getAverageRating(reviewsRatings);
+    teacher.reviews = reviewsRatings;
+
+    delete teacher.phone;
+    delete teacher.email;
+    delete teacher.aadhaarNumber;
+    delete teacher.panCardNumber;
+    delete teacher.gstNumber;
+    delete teacher.isActive;
+    delete teacher.status;
+
+    res.json(teacher.transform());
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => {
