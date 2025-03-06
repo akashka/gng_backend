@@ -66,6 +66,7 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 
 exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log('-------------------------------------------');
     let emailPhone: string | any[] = [],
       emailUser,
       userFound;
@@ -76,6 +77,8 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
       emailPhone = await User.find({ phone: req.body.phone, isActive: true });
     }
 
+    console.log('emailPhone', JSON.stringify(emailPhone));
+    console.log('emailUser', JSON.stringify(emailUser));
     if (emailPhone.length > 0 || emailUser.length > 0) {
       throw new APIError({
         message: 'Email or Phone Number Not found or already registered',
@@ -92,10 +95,13 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
       emailPhone = await User.find({ phone: req.body.phone, isActive: false });
     }
 
+    console.log('emailPhone', JSON.stringify(emailPhone));
+    console.log('emailUser', JSON.stringify(emailUser));
     if (emailUser.length && emailPhone.length)
       userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
+    console.log('userFound', JSON.stringify(userFound));
 
     if (userFound && userFound.otp === req.body.otp) {
       userFound.isActive = true;
@@ -115,6 +121,7 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
       });
     }
   } catch (error) {
+    console.log('err', JSON.stringify(error));
     next(error);
   }
 };
