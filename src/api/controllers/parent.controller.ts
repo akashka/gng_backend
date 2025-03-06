@@ -127,13 +127,14 @@ exports.verifyOtpParent = async (req: Request, res: Response, next: NextFunction
       parentFound.isActive = true;
       const savedParent = await parentFound.save();
 
+      console.log('------------------------------------------------------------------');
       const { user, accessToken } = await User.findAndGenerateToken(savedUser);
+      console.log('user', JSON.stringify(user));
+      console.log('accessToken', JSON.stringify(accessToken));
       const token = generateTokenResponse(savedUser, accessToken);
-      const userTransformed = user.transform();
-
-      console.log('userTransformed', JSON.stringify(userTransformed));
       console.log('token', JSON.stringify(token));
-
+      const userTransformed = user.transform();
+      console.log('userTransformed', JSON.stringify(userTransformed));
       const data = { token, user: userTransformed };
       return apiJson({ req, res, data });
     } else {
