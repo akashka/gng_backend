@@ -113,3 +113,29 @@ exports.remove = (req: Request, res: Response, next: NextFunction) => {
     .then(() => res.status(httpStatus.NO_CONTENT).end())
     .catch((e: any) => next(e));
 };
+
+exports.updatePassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    let emailUser = [];
+    let emailPhone = [];
+    let userFound = null;
+
+    if (req.body.email) {
+      emailUser = await User.find({ email: req.body.email });
+    }
+    if (req.body.phone) {
+      emailPhone = await User.find({ email: req.body.phone });
+    }
+
+    if (emailUser.length && emailPhone.length)
+      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+    else if (emailUser.length) userFound = emailUser[0];
+    else if (emailPhone.length) userFound = emailPhone[0];
+
+    userFound.password = req.body.password;
+    const savedUser = await userFound.save();
+    res.json(savedUser.transform());
+  } catch (error) {
+    next(error);
+  }
+};

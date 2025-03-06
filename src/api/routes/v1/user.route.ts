@@ -16,6 +16,8 @@ router.route('/').get(controller.list).post(controller.create);
 
 router.route('/profile').get(controller.loggedIn);
 
+router.route('/update-password').put(controller.updatePassword);
+
 router
   .route('/:userId')
   .get(controller.get)

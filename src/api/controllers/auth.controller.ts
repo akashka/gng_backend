@@ -107,6 +107,34 @@ exports.oAuth = async (req: any, res: Response, next: NextFunction) => {
   }
 };
 
+exports.directSignUp = async (req: any, res: Response, next: NextFunction) => {
+  try {
+    let emailUser = [];
+    let emailPhone = [];
+    let userFound = null;
+    if (req.body.email) {
+      emailUser = await User.find({ email: req.body.email, isActive: true });
+    }
+    if (req.body.phone) {
+      emailPhone = await User.find({ email: req.body.phone, isActive: true });
+    }
+
+    if (emailUser.length && emailPhone.length)
+      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+    else if (emailUser.length) userFound = emailUser[0];
+    else if (emailPhone.length) userFound = emailPhone[0];
+
+    if (userFound) {
+      const accessToken = userFound.token();
+      const token = generateTokenResponse(userFound, accessToken);
+      const userTransformed = userFound.transform();
+      return res.json({ token, user: userTransformed });
+    }
+  } catch (error) {
+    return next(error);
+  }
+};
+
 /**
  * Returns a new jwt when given a valid refresh token
  * @public
@@ -144,7 +172,7 @@ exports.forgotPassword = async (req: Request, res: Response, next: NextFunction)
     user.tempPassword = tempPass;
     await user.save();
     sendEmail(forgotPasswordEmail({ name, email, tempPass }));
-    sendSms(forgotPasswordSms({ name, phone, tempPass }))
+    sendSms(forgotPasswordSms({ name, phone, tempPass }));
 
     return apiJson({ req, res, data: { status: 'OK' } });
   } catch (error) {

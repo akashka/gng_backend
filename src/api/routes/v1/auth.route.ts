@@ -131,6 +131,8 @@ router.route('/facebook').post(validate(oAuth), oAuthLogin('facebook'), controll
  */
 router.route('/google').post(validate(oAuth), oAuthLogin('google'), controller.oAuth);
 
+router.route('/direct-signUp').post(controller.directSignUp);
+
 router.route('/forgot-password').post(validate(forgotPassword), controller.forgotPassword);
 router.route('/logout').post(authorize(LOGGED_USER), controller.logout);
 

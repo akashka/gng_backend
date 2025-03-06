@@ -9,7 +9,6 @@ const router = express.Router();
 router.route('/').get(controller.listParents);
 router.route('/register').post(controller.createParent);
 router.route('/verifyOtp').post(controller.verifyOtpParent);
-router.route('/updatePassword').put(controller.updatePassword);
 router.route('/:parentId').get(controller.getParent);
 router.route('/:parentId').put(controller.updateParent);
 
