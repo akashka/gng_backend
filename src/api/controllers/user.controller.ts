@@ -117,7 +117,7 @@ exports.remove = (req: Request, res: Response, next: NextFunction) => {
 exports.updatePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let emailUser = [];
-    let emailPhone = [];
+    let emailPhone: string | any[] = [];
     let userFound = null;
 
     if (req.body.email) {
