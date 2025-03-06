@@ -37,8 +37,10 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 
     const sendOtp = req.body.sendOtp || false;
     delete req.body.sendOtp;
-    const teacher = new Teacher(req.body);
-    teacher.uuid = uuidv4();
+    const teacher = new Teacher({
+      ...req.body,
+      uuid: uuidv4()
+    });
     const user = new User({
       otp: Math.floor(100000 + Math.random() * 900000),
       picture: req.body.profileImage,
@@ -101,7 +103,7 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
     console.log('emailUser', JSON.stringify(emailUser));
     if (emailUser.length && emailPhone.length)
       userFound = emailUser.filter((obj1: { _id: any }) =>
-        emailPhone.some((obj2: { _id: any }) => obj2._id === obj1._id)
+        emailPhone.some((obj2: { _id: any }) => obj2._id !== obj1._id)
       );
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
