@@ -2,29 +2,6 @@ export {};
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-// Schema for days objects
-const DaySchema = new Schema(
-  {
-    day_name: {
-      type: String,
-      required: true,
-      enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-    }
-  },
-  { _id: false }
-);
-
-// Schema for time objects
-const TimeSchema = new Schema(
-  {
-    start_time: {
-      type: String,
-      required: true
-    }
-  },
-  { _id: false }
-);
-
 // Main ClassBatch schema
 const ClassBatchSchema = new Schema(
   {
@@ -56,16 +33,18 @@ const ClassBatchSchema = new Schema(
         required: true
       }
     ],
-    days: {
-      type: [DaySchema],
-      required: true,
-      validate: [arrayMinLength, 'At least one day must be selected']
-    },
-    time: {
-      type: [TimeSchema],
-      required: true,
-      validate: [arrayMinLength, 'At least one time slot must be selected']
-    },
+    days: [
+      {
+        type: String,
+        required: true
+      }
+    ],
+    time: [
+      {
+        type: String,
+        required: true
+      }
+    ],
     fees: {
       type: Number,
       required: true,

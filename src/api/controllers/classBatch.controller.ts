@@ -17,7 +17,7 @@ exports.getClassBatches = async (req: Request, res: Response, next: NextFunction
     };
 
     if (teacherId) {
-      filter.teacherId = mongoose.Types.ObjectId(teacherId);
+      filter.teacherId = teacherId;
     }
 
     if (subjects) {

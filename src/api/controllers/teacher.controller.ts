@@ -233,9 +233,7 @@ exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) 
 
     // Update only the fields present in the request body
     for (const key in updateData) {
-      if (updateData.hasOwnProperty(key)) {
-        teacher[key] = updateData[key];
-      }
+      teacher[key] = updateData[key];
     }
 
     const savedTeacher = await teacher.save();
