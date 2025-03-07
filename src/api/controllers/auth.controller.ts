@@ -4,7 +4,7 @@ const httpStatus = require('http-status');
 import { User } from '../../api/models';
 const RefreshToken = require('../models/refreshToken.model');
 const moment = require('moment-timezone');
-import { apiJson, randomString } from '../../api/utils/Utils';
+import { apiJson, randomString, unionById } from '../../api/utils/Utils';
 import { sendEmail, welcomeEmail, forgotPasswordEmail, slackWebhook } from '../../api/utils/MsgUtils';
 import { sendSms, welcomeSms, forgotPasswordSms } from '../../api/utils/SmsUtils';
 const { SEC_ADMIN_EMAIL, JWT_EXPIRATION_MINUTES, slackEnabled, emailEnabled } = require('../../config/vars');
@@ -109,7 +109,7 @@ exports.oAuth = async (req: any, res: Response, next: NextFunction) => {
 
 exports.directSignUp = async (req: any, res: Response, next: NextFunction) => {
   try {
-    let emailPhone: string | any[] = [];
+    let emailPhone: any[] = [];
     let emailUser = [];
     let userFound = null;
     if (req.body.email) {
@@ -119,8 +119,7 @@ exports.directSignUp = async (req: any, res: Response, next: NextFunction) => {
       emailPhone = await User.find({ phone: req.body.phone, isActive: true });
     }
 
-    if (emailUser.length && emailPhone.length)
-      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+    if (emailUser.length && emailPhone.length) userFound = unionById(emailUser, emailPhone)[0];
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
 

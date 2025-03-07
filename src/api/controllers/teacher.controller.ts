@@ -37,10 +37,11 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 
     const sendOtp = req.body.sendOtp || false;
     delete req.body.sendOtp;
-    const teacher = new Teacher({
+    const bod = {
       ...req.body,
       uuid: uuidv4()
-    });
+    };
+    const teacher = new Teacher(bod);
     console.log('teacher', JSON.stringify(teacher));
 
     const user = new User({
@@ -102,7 +103,7 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
 
     console.log('emailPhone', JSON.stringify(emailPhone));
     console.log('emailUser', JSON.stringify(emailUser));
-    if (emailUser.length && emailPhone.length) userFound = unionById(emailUser, emailPhone);
+    if (emailUser.length && emailPhone.length) userFound = unionById(emailUser, emailPhone)[0];
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
     console.log('userFound', JSON.stringify(userFound));

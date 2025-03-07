@@ -5,7 +5,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const httpStatus = require('http-status');
 const { omit } = require('lodash');
 import { User } from '../../api/models';
-import { apiJson } from '../../api/utils/Utils';
+import { apiJson, unionById } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
 
 const likesMap: any = {}; // key (userId__noteId) : 1
@@ -117,7 +117,7 @@ exports.remove = (req: Request, res: Response, next: NextFunction) => {
 exports.updatePassword = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let emailUser = [];
-    let emailPhone: string | any[] = [];
+    let emailPhone: any[] = [];
     let userFound = null;
 
     if (req.body.email) {
@@ -127,8 +127,7 @@ exports.updatePassword = async (req: Request, res: Response, next: NextFunction)
       emailPhone = await User.find({ phone: req.body.phone });
     }
 
-    if (emailUser.length && emailPhone.length)
-      userFound = emailUser.filter((value: any) => emailPhone.includes(value))[0];
+    if (emailUser.length && emailPhone.length) userFound = unionById(emailUser, emailPhone)[0];
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
 

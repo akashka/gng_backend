@@ -186,11 +186,13 @@ export function randomString(len = 10, charStr = 'abcdefghijklmnopqrstuvwxyz0123
 
 export function unionById(array1: any[], array2: any[]) {
   const idMap = new Map();
-  array1.forEach((item: { _id: any }) => {
-    idMap.set(item._id, item);
+  array1.forEach((item: { id: any }) => {
+    console.log('item.id1', item.id);
+    idMap.set(item.id, item);
   });
-  array2.forEach((item: { _id: any }) => {
-    idMap.set(item._id, item);
+  array2.forEach((item: { id: any }) => {
+    console.log('item.id2', item.id);
+    idMap.set(item.id, item);
   });
   return Array.from(idMap.values());
 }
