@@ -49,11 +49,12 @@ const teacherBankDetailsSchema = new mongoose.Schema({
   }
 });
 
-const teacherexamDetailsSchema = new mongoose.Schema({
-  startedDatetime: {
-    type: Date
+const teacherExamDetailsSchema = new mongoose.Schema({
+  examinationNumber: {
+    type: Number,
+    default: 0
   },
-  leftDatetime: {
+  startedDatetime: {
     type: Date
   },
   completedDatetime: {
@@ -248,9 +249,11 @@ const teacherSchema = new mongoose.Schema(
       required: true,
       ref: 'User'
     },
-    examDetails: {
-      type: teacherexamDetailsSchema
-    }
+    examDetails: [
+      {
+        type: teacherExamDetailsSchema
+      }
+    ]
   },
   {
     timestamps: true
