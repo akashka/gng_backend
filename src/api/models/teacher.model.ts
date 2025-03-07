@@ -234,7 +234,7 @@ const teacherSchema = new mongoose.Schema(
         'firststage',
         'examFailed',
         'examPassed',
-        'examLeft',
+        'infoSaved',
         'bankSaved',
         'FeesSaved',
         'PhotosUploaded',

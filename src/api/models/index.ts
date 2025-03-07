@@ -1,3 +1,10 @@
 export const User = require('./user.model');
 export const Teachers = require('./teacher.model');
 export const Feedbacks = require('./feedbacks.model');
+export const ClassBatch = require('./classBatch.model');
+export const Parent = require('./parent.model');
+export const Questionpaper = require('./questionpaper.model');
+export const RefreshToken = require('./refreshToken.model');
+export const ReviewsRatings = require('./reviewsRatings.model');
+export const StaticData = require('./staticData.model');
+export const Student = require('./student.model');

@@ -15,6 +15,7 @@ const reviewsRatingsRoutes = require('./reviewsRatings.route');
 const teacherMappingRoutes = require('./teacherMapping.route');
 const resourcesRoutes = require('./resources.route');
 const ocrRoutes = require('./ocr.route');
+const classBatchRoutes = require('./classBatch.route');
 
 const router = express.Router();
 
@@ -41,8 +42,8 @@ router.use('/questions', questionsRoutes);
 router.use('/staticdata', staticDataRoutes);
 router.use('/feedbacks', feedbacksRoutes);
 router.use('/reviewsratings', reviewsRatingsRoutes);
-router.use('/teachermapping', teacherMappingRoutes);
 router.use('/resources', resourcesRoutes);
 router.use('/ocr', ocrRoutes);
+router.use('/classBatches', classBatchRoutes);
 
 module.exports = router;
