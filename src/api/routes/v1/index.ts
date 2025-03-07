@@ -12,7 +12,6 @@ const questionsRoutes = require('./questions.route');
 const staticDataRoutes = require('./staticData.route');
 const feedbacksRoutes = require('./feedbacks.route');
 const reviewsRatingsRoutes = require('./reviewsRatings.route');
-const teacherMappingRoutes = require('./teacherMapping.route');
 const resourcesRoutes = require('./resources.route');
 const ocrRoutes = require('./ocr.route');
 const classBatchRoutes = require('./classBatch.route');
