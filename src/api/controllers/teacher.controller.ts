@@ -37,11 +37,7 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 
     const sendOtp = req.body.sendOtp || false;
     delete req.body.sendOtp;
-    const bod = {
-      ...req.body,
-      uuid: uuidv4()
-    };
-    const teacher = new Teacher(bod);
+    const teacher = new Teacher(req.body);
     console.log('teacher', JSON.stringify(teacher));
 
     const user = new User({
@@ -114,11 +110,17 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
       const savedUser = await userFound.save();
 
       const teacherFound = await Teacher.findOne({ userId: userFound._id });
-      teacherFound.isActive = true;
-      const savedTeacher = await teacherFound.save();
-
-      res.status(httpStatus.CREATED);
-      res.json(savedTeacher.transform());
+      if (teacherFound) {
+        teacherFound.isActive = true;
+        const savedTeacher = await teacherFound.save();
+        res.status(httpStatus.CREATED);
+        res.json(savedTeacher.transform());
+      } else {
+        throw new APIError({
+          message: 'Teacher not found',
+          status: httpStatus.NOT_FOUND
+        });
+      }
     } else {
       throw new APIError({
         message: 'OTP Mismatched or details not found',

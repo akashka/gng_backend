@@ -63,6 +63,12 @@ const teacherexamDetailsSchema = new mongoose.Schema({
 
 const teacherSchema = new mongoose.Schema(
   {
+    uuid: {
+      type: String,
+      required: true,
+      unique: true,
+      default: () => require('crypto').randomUUID()
+    },
     name: {
       type: String,
       required: [true, 'Name is required'],
