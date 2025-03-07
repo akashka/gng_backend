@@ -2,7 +2,6 @@ export {};
 import { NextFunction, Request, Response } from 'express';
 const mongoose = require('mongoose');
 const ClassBatch = require('../models/classBatch.model');
-const { validationResult } = require('express-validator');
 
 // Get all batches with optional filtering
 exports.getClassBatches = async (req: Request, res: Response, next: NextFunction) => {
@@ -68,23 +67,18 @@ exports.getClassBatchById = async (req: Request, res: Response, next: NextFuncti
 // Create new batch
 exports.createClassBatch = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const batchData = req.body;
 
     // Ensure days and time are in the correct format
     if (batchData.days && Array.isArray(batchData.days)) {
       batchData.days = batchData.days.map((day: any) => {
-        return typeof day === 'object' ? day : { day_name: day };
+        return typeof day === 'object' ? day.day_name : day;
       });
     }
 
     if (batchData.time && Array.isArray(batchData.time)) {
       batchData.time = batchData.time.map((time: any) => {
-        return typeof time === 'object' ? time : { start_time: time };
+        return typeof time === 'object' ? time.start_time : time;
       });
     }
 
@@ -116,13 +110,13 @@ exports.updateClassBatch = async (req: Request, res: Response, next: NextFunctio
     // Ensure days and time are in the correct format
     if (updateData.days && Array.isArray(updateData.days)) {
       updateData.days = updateData.days.map((day: any) => {
-        return typeof day === 'object' ? day : { day_name: day };
+        return typeof day === 'object' ? day.day_name : day;
       });
     }
 
     if (updateData.time && Array.isArray(updateData.time)) {
       updateData.time = updateData.time.map((time: any) => {
-        return typeof time === 'object' ? time : { start_time: time };
+        return typeof time === 'object' ? time.start_time : time;
       });
     }
 
