@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/classBatch.controller');
-const authMiddleware = require('../middleware/auth');
+const controller = require('../../controllers/classBatch.controller');
 
 // Routes
 // Get all batches with optional filtering

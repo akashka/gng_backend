@@ -13,8 +13,7 @@ exports.getClassBatches = async (req: Request, res: Response, next: NextFunction
       teacherId,
       subjects,
       boards,
-      classes,
-      isActive
+      classes
     };
 
     if (teacherId) {
@@ -31,10 +30,6 @@ exports.getClassBatches = async (req: Request, res: Response, next: NextFunction
 
     if (classes) {
       filter.classes = { $in: Array.isArray(classes) ? classes : [classes] };
-    }
-
-    if (isActive !== undefined) {
-      filter.isActive = isActive === 'true';
     }
 
     const classBatches = await ClassBatch.find(filter).sort({ batchStartDate: 1 }).exec();
