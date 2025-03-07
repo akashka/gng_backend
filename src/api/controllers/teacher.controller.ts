@@ -38,7 +38,6 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
     const sendOtp = req.body.sendOtp || false;
     delete req.body.sendOtp;
     const teacher = new Teacher(req.body);
-    console.log('teacher', JSON.stringify(teacher));
 
     const user = new User({
       otp: Math.floor(100000 + Math.random() * 900000),
@@ -68,7 +67,6 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
 
 exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('-------------------------------------------');
     let emailPhone: any[] = [],
       emailUser,
       userFound;
@@ -79,8 +77,6 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
       emailPhone = await User.find({ phone: req.body.phone, isActive: true });
     }
 
-    console.log('emailPhone', JSON.stringify(emailPhone));
-    console.log('emailUser', JSON.stringify(emailUser));
     if (emailPhone.length > 0 || emailUser.length > 0) {
       throw new APIError({
         message: 'Email or Phone Number Not found or already registered',
@@ -97,12 +93,9 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
       emailPhone = await User.find({ phone: req.body.phone, isActive: false });
     }
 
-    console.log('emailPhone', JSON.stringify(emailPhone));
-    console.log('emailUser', JSON.stringify(emailUser));
     if (emailUser.length && emailPhone.length) userFound = unionById(emailUser, emailPhone)[0];
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
-    console.log('userFound', JSON.stringify(userFound));
 
     if (userFound && userFound.otp === req.body.otp) {
       userFound.isActive = true;
@@ -227,8 +220,6 @@ exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => 
  */
 exports.updateTeacher = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('req.params', req.params);
-    console.log('req.body', req.body);
     const teacher = await Teacher.findById(req.params.teacherId);
     if (!teacher) {
       throw new APIError({

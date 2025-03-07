@@ -243,19 +243,19 @@ async function extractDocumentNumber(
  * @param {object} req - Express request object
  * @param {object} res - Express response object
  */
-async function handleDocumentOCR(req: Request, res: Response) {
+export async function handleDocumentOCR(req: Request, res: Response): Promise<void> {
   try {
     const { base64Image, documentType } = req.body;
 
     if (!base64Image) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Missing base64 image data'
       });
     }
 
     if (!documentType) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Missing document type'
       });
@@ -264,13 +264,13 @@ async function handleDocumentOCR(req: Request, res: Response) {
     const result = await extractDocumentNumber(base64Image, documentType);
 
     if (result.success) {
-      return res.status(200).json(result);
+      res.status(200).json(result);
     } else {
-      return res.status(422).json(result);
+      res.status(422).json(result);
     }
   } catch (error) {
     console.error('Request handling error:', error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       error: 'Server error processing request'
     });
