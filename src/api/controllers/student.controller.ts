@@ -152,13 +152,15 @@ exports.listStudents = async (
       searchQuery: any;
       boards: any;
       classes: any;
+      parentId: any;
+      isActive: Boolean;
     };
   },
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { page = 1, sortOptions, searchQuery, boards, classes } = req.query;
+    const { page = 1, sortOptions, searchQuery, boards, classes, parentId, isActive } = req.query;
 
     // Step 1: Fetch all students
     let students = await Student.find();
@@ -167,7 +169,13 @@ exports.listStudents = async (
       t.rating = getAverageRating(reviewsRatings);
     });
 
-    students = students.filter((student: { isActive: Boolean }) => student.isActive === true);
+    if (req.query.isActive) {
+      students = students.filter((student: { isActive: Boolean }) => student.isActive === req.query.isActive);
+    }
+
+    if (req.query.parentId) {
+      students = students.filter((student: { parentId: String }) => student.parentId === req.query.parentId);
+    }
 
     // Step 2: Filter based on searchQuery
     if (searchQuery) {

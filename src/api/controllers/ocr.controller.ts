@@ -147,6 +147,137 @@ async function performOCR(imagePath: string): Promise<string> {
   }
 }
 
+/**
+ * Extract identification numbers from documents using OCR
+ * @param {string} base64Image - Base64 encoded image data
+ * @param {string} documentType - Type of document: 'aadhaar', 'pan', or 'gst'
+ * @returns {Promise<object>} Object containing the extracted ID number or error information
+ */
+async function extractDocumentNumber(
+  base64Image: WithImplicitCoercion<string> | { [Symbol.toPrimitive](hint: 'string'): string },
+  documentType: string
+) {
+  // Validate document type
+  if (!['aadhaar', 'pan', 'gst'].includes(documentType.toLowerCase())) {
+    return {
+      success: false,
+      error: 'Invalid document type. Must be "aadhaar", "pan", or "gst".'
+    };
+  }
+
+  try {
+    // Convert base64 to buffer
+    const imageBuffer = Buffer.from(base64Image, 'base64');
+
+    // Create temporary file to process (Tesseract works better with files)
+    const tempFilePath = path.join(__dirname, 'temp_image.png');
+    fs.writeFileSync(tempFilePath, imageBuffer);
+
+    // Initialize tesseract worker
+    const worker = await createWorker('eng');
+
+    // Optimize OCR based on document type
+    if (documentType.toLowerCase() === 'aadhaar') {
+      await worker.setParameters({
+        tessedit_char_whitelist: '0123456789 '
+      });
+    } else if (documentType.toLowerCase() === 'pan') {
+      await worker.setParameters({
+        tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+      });
+    }
+
+    // Perform OCR
+    const {
+      data: { text }
+    } = await worker.recognize(tempFilePath);
+
+    // Clean up temp file
+    fs.unlinkSync(tempFilePath);
+
+    // Extract the appropriate number based on document type
+    let extractedNumber = null;
+
+    if (documentType.toLowerCase() === 'aadhaar') {
+      // Aadhaar is a 12-digit number, often space or hyphen separated
+      const aadhaarRegex = /\b(\d{4}[\s-]?\d{4}[\s-]?\d{4})\b/;
+      const match = text.match(aadhaarRegex);
+      extractedNumber = match ? match[1].replace(/[\s-]/g, '') : null;
+    } else if (documentType.toLowerCase() === 'pan') {
+      // PAN is 10 characters: 5 letters, 4 numbers, 1 letter
+      const panRegex = /\b([A-Z]{5}[0-9]{4}[A-Z]{1})\b/;
+      const match = text.match(panRegex);
+      extractedNumber = match ? match[1] : null;
+    } else if (documentType.toLowerCase() === 'gst') {
+      // GST is 15 characters: 2 state code, 10 PAN, 1 entity, 1 check, 1 Z
+      const gstRegex = /\b(\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z\d]{1}[Z]{1}[A-Z\d]{1})\b/;
+      const match = text.match(gstRegex);
+      extractedNumber = match ? match[1] : null;
+    }
+
+    await worker.terminate();
+
+    if (extractedNumber) {
+      return {
+        success: true,
+        documentType: documentType,
+        idNumber: extractedNumber
+      };
+    } else {
+      return {
+        success: false,
+        error: `Could not extract ${documentType} number from the image. Please ensure the image is clear.`
+      };
+    }
+  } catch (error) {
+    console.error('OCR processing error:', error);
+    return {
+      success: false,
+      error: 'Error processing the document. Please try again with a clearer image.'
+    };
+  }
+}
+
+/**
+ * Express middleware/handler for document OCR
+ * @param {object} req - Express request object
+ * @param {object} res - Express response object
+ */
+async function handleDocumentOCR(req: Request, res: Response) {
+  try {
+    const { base64Image, documentType } = req.body;
+
+    if (!base64Image) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing base64 image data'
+      });
+    }
+
+    if (!documentType) {
+      return res.status(400).json({
+        success: false,
+        error: 'Missing document type'
+      });
+    }
+
+    const result = await extractDocumentNumber(base64Image, documentType);
+
+    if (result.success) {
+      return res.status(200).json(result);
+    } else {
+      return res.status(422).json(result);
+    }
+  } catch (error) {
+    console.error('Request handling error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'Server error processing request'
+    });
+  }
+}
+
 export default {
-  processImageOCR
+  processImageOCR,
+  handleDocumentOCR
 };
