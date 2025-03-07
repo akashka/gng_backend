@@ -183,3 +183,14 @@ export function randomString(len = 10, charStr = 'abcdefghijklmnopqrstuvwxyz0123
   const chars = [...`${charStr}`];
   return [...Array(len)].map((i) => chars[(Math.random() * chars.length) | 0]).join('');
 }
+
+export function unionById(array1: any[], array2: any[]) {
+  const idMap = new Map();
+  array1.forEach((item: { _id: any }) => {
+    idMap.set(item._id, item);
+  });
+  array2.forEach((item: { _id: any }) => {
+    idMap.set(item._id, item);
+  });
+  return Array.from(idMap.values());
+}

@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const httpStatus = require('http-status');
 const { omit } = require('lodash');
-import { apiJson } from '../../api/utils/Utils';
+import { apiJson, unionById } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
 const Teacher = require('../models/teacher.model');
 const User = require('../models/user.model');
@@ -41,6 +41,8 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
       ...req.body,
       uuid: uuidv4()
     });
+    console.log('teacher', JSON.stringify(teacher));
+
     const user = new User({
       otp: Math.floor(100000 + Math.random() * 900000),
       picture: req.body.profileImage,
@@ -51,7 +53,6 @@ exports.createTeacher = async (req: Request, res: Response, next: NextFunction) 
       phone: req.body.phone,
       password: req.body.password
     });
-
     console.log('User', JSON.stringify(user));
 
     const savedUser = await user.save();
@@ -101,10 +102,7 @@ exports.verifyOtpTeacher = async (req: Request, res: Response, next: NextFunctio
 
     console.log('emailPhone', JSON.stringify(emailPhone));
     console.log('emailUser', JSON.stringify(emailUser));
-    if (emailUser.length && emailPhone.length)
-      userFound = emailUser.filter((obj1: { _id: any }) =>
-        emailPhone.some((obj2: { _id: any }) => obj2._id !== obj1._id)
-      );
+    if (emailUser.length && emailPhone.length) userFound = unionById(emailUser, emailPhone);
     else if (emailUser.length) userFound = emailUser[0];
     else if (emailPhone.length) userFound = emailPhone[0];
     console.log('userFound', JSON.stringify(userFound));
