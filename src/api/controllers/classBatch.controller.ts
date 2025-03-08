@@ -2,6 +2,24 @@ export {};
 import { NextFunction, Request, Response } from 'express';
 const mongoose = require('mongoose');
 const ClassBatch = require('../models/classBatch.model');
+const Teacher = require('../models/teacher.model');
+
+const updateTeacherWeekDays = async (teacherId: any) => {
+  if (!teacherId) return;
+  const teacher = await Teacher.findById(teacherId);
+  const classBatches = await ClassBatch.find({ teacherId }).lean().exec();
+  if (teacher && classBatches && classBatches.length > 0) {
+    let daysOfWeek: any = [];
+    let timeOfDay: any = [];
+    for (let c = 0; c < classBatches.length; c++) {
+      daysOfWeek = daysOfWeek.concat(classBatches[c].days);
+      timeOfDay = timeOfDay.concat(classBatches[c].time);
+    }
+    teacher.daysOfWeek = daysOfWeek;
+    teacher.timeOfDay = timeOfDay;
+    const savedTeacher = await teacher.save();
+  }
+};
 
 // Get all batches with optional filtering
 exports.getClassBatches = async (req: Request, res: Response, next: NextFunction) => {
@@ -93,6 +111,8 @@ exports.createClassBatch = async (req: Request, res: Response, next: NextFunctio
     const newClassBatch = new ClassBatch(batchData);
     await newClassBatch.save();
 
+    await updateTeacherWeekDays(batchData.teacherId);
+
     res.status(201).json(newClassBatch);
   } catch (error) {
     console.error('Error creating class batch:', error);
@@ -134,6 +154,8 @@ exports.updateClassBatch = async (req: Request, res: Response, next: NextFunctio
       return res.status(404).json({ message: 'Class batch not found' });
     }
 
+    await updateTeacherWeekDays(updateData.teacherId);
+
     res.status(200).json(updatedClassBatch);
   } catch (error) {
     console.error('Error updating class batch:', error);
@@ -151,6 +173,8 @@ exports.deleteClassBatch = async (req: Request, res: Response, next: NextFunctio
     if (!deletedClassBatch) {
       return res.status(404).json({ message: 'Class batch not found' });
     }
+
+    await updateTeacherWeekDays(deletedClassBatch.teacherId);
 
     res.status(200).json({ message: 'Class batch deleted successfully' });
   } catch (error) {
