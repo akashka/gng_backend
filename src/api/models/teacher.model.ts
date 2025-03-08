@@ -229,17 +229,7 @@ const teacherSchema = new mongoose.Schema(
       type: String,
       required: true,
       default: 'signedup',
-      enum: [
-        'signedup',
-        'firststage',
-        'examFailed',
-        'examPassed',
-        'infoSaved',
-        'bankSaved',
-        'feesSaved',
-        'photosUploaded',
-        'onboarded'
-      ]
+      enum: ['signedup', 'firststage', 'examFailed', 'examPassed', 'infoSaved', 'bankSaved', 'feesSaved', 'onboarded']
     },
     demoVideo: {
       type: String
@@ -297,7 +287,8 @@ const ALLOWED_FIELDS = [
   'status',
   'demoVideo',
   'userId',
-  'examDetails'
+  'examDetails',
+  'batches'
 ];
 
 teacherSchema.method({
