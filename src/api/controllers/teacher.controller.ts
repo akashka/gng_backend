@@ -286,30 +286,19 @@ exports.listTeachers = async (
 
     // Step 1: Fetch all teachers
     let teachers = await Teacher.find();
-    teachers.map(
-      async (t: {
-        id: any;
-        rating: number;
-        phone: any;
-        email: any;
-        aadhaarNumber: any;
-        panCardNumber: any;
-        gstNumber: any;
-        isActive: any;
-        status: any;
-        batches: any;
-      }) => {
+
+    teachers = await Promise.all(
+      teachers.map(async (t: any) => {
         const reviewsRatings = await ReviewsRatings.find({ foreignId: t.id });
-        t.rating = getAverageRating(reviewsRatings);
-        t.batches = await ClassBatch.find({ teacherId: t.id });
-        delete t.phone;
-        delete t.email;
-        delete t.aadhaarNumber;
-        delete t.panCardNumber;
-        delete t.gstNumber;
-        delete t.isActive;
-        delete t.status;
-      }
+        const batches = await ClassBatch.find({ teacherId: t.id });
+
+        // Create a new object with the desired properties
+        return {
+          ...t.toObject(), // Convert Mongoose document to plain object
+          rating: getAverageRating(reviewsRatings),
+          batches: batches
+        };
+      })
     );
 
     teachers = teachers.filter((teacher: { isActive: Boolean }) => teacher.isActive === true);
