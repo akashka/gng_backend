@@ -301,6 +301,8 @@ exports.listTeachers = async (
       })
     );
 
+    console.log('teachers', JSON.stringify(teachers));
+
     teachers = teachers.filter((teacher: { isActive: Boolean }) => teacher.isActive === true);
 
     // Step 2: Filter based on searchQuery
@@ -375,9 +377,13 @@ exports.listTeachers = async (
     const startIndex = (page - 1) * pageSize;
     const paginatedTeachers = teachers.slice(startIndex, startIndex + pageSize);
 
+    console.log('paginatedTeachers', JSON.stringify(paginatedTeachers));
+
     // Step 6: Transform and return results
-    const transformedTeachers = paginatedTeachers.map((teacher: { transform: () => any }) => teacher.transform());
-    res.json(transformedTeachers);
+    const transformedTeachers = paginatedTeachers.map((teacher: any) => teacher?.transform());
+    console.log('transformedTeachers', JSON.stringify(transformedTeachers));
+
+    res.json(paginatedTeachers);
   } catch (error) {
     next(error);
   }
