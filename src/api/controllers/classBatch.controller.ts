@@ -16,6 +16,7 @@ exports.getClassBatches = async (req: Request, res: Response, next: NextFunction
       classes
     };
 
+    console.log('req.query', JSON.stringify(req.query));
     if (teacherId) {
       filter.teacherId = teacherId;
     }
@@ -32,7 +33,10 @@ exports.getClassBatches = async (req: Request, res: Response, next: NextFunction
       filter.classes = { $in: Array.isArray(classes) ? classes : [classes] };
     }
 
+    console.log('filter', JSON.stringify(filter));
     const classBatches = await ClassBatch.find(filter).sort({ batchStartDate: 1 }).exec();
+
+    console.log('classBatches', JSON.stringify(classBatches));
 
     res.status(200).json(classBatches);
   } catch (error) {

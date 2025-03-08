@@ -236,9 +236,9 @@ const teacherSchema = new mongoose.Schema(
         'examPassed',
         'infoSaved',
         'bankSaved',
-        'FeesSaved',
-        'PhotosUploaded',
-        'Onboarded'
+        'feesSaved',
+        'photosUploaded',
+        'onboarded'
       ]
     },
     demoVideo: {

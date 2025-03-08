@@ -10,6 +10,11 @@ const ClassBatchSchema = new Schema(
       ref: 'Teacher',
       required: true
     },
+    name: {
+      type: String,
+      required: true,
+      trim: true
+    },
     batchInfo: {
       type: String,
       required: true,
@@ -74,7 +79,7 @@ const ClassBatchSchema = new Schema(
         validator: function (value: Date) {
           // Ensure enrollment date is at least 7 days from today
           const minDate = new Date();
-          minDate.setDate(minDate.getDate() + 7);
+          minDate.setDate(minDate.getDate() + 6);
           return value >= minDate;
         },
         message: 'Last enrollment date must be at least 7 days from today'

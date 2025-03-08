@@ -7,6 +7,7 @@ const { omit } = require('lodash');
 import { apiJson, unionById } from '../../api/utils/Utils';
 const { handler: errorHandler } = require('../middlewares/error');
 const Teacher = require('../models/teacher.model');
+const ClassBatch = require('../models/classBatch.model');
 const User = require('../models/user.model');
 const ReviewsRatings = require('../models/reviewsRatings.model');
 const APIError = require('../utils/APIError');
@@ -160,6 +161,11 @@ const getAverageRating = (reviewsRatings: { rating: any }[]) => {
   return total / reviewsRatings.length;
 };
 
+const getClassBatches = async (teacherId: String) => {
+  const classBatches = await ClassBatch.find({ teacherId }).lean().exec();
+  return classBatches;
+};
+
 exports.getTeacherByUserId = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let teacher = await Teacher.findOne({ userId: req.params.userId });
@@ -172,6 +178,7 @@ exports.getTeacherByUserId = async (req: Request, res: Response, next: NextFunct
     const reviewsRatings = await ReviewsRatings.find({ foreignId: teacher.id });
     teacher.rating = getAverageRating(reviewsRatings);
     teacher.reviews = reviewsRatings;
+    teacher.batches = await getClassBatches(teacher.id);
 
     delete teacher.phone;
     delete teacher.email;
@@ -199,6 +206,7 @@ exports.getTeacher = async (req: Request, res: Response, next: NextFunction) => 
     const reviewsRatings = await ReviewsRatings.find({ foreignId: teacher.id });
     teacher.rating = getAverageRating(reviewsRatings);
     teacher.reviews = reviewsRatings;
+    teacher.batches = await getClassBatches(teacher.id);
 
     delete teacher.phone;
     delete teacher.email;
@@ -294,9 +302,11 @@ exports.listTeachers = async (
         gstNumber: any;
         isActive: any;
         status: any;
+        batches: any;
       }) => {
         const reviewsRatings = await ReviewsRatings.find({ foreignId: t.id });
         t.rating = getAverageRating(reviewsRatings);
+        t.batches = await getClassBatches(t.id);
         delete t.phone;
         delete t.email;
         delete t.aadhaarNumber;
