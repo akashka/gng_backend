@@ -15,6 +15,7 @@ const reviewsRatingsRoutes = require('./reviewsRatings.route');
 const resourcesRoutes = require('./resources.route');
 const ocrRoutes = require('./ocr.route');
 const classBatchRoutes = require('./classBatch.route');
+const bookingRoutes = require('./booking.route');
 
 const router = express.Router();
 
@@ -44,5 +45,6 @@ router.use('/reviewsratings', reviewsRatingsRoutes);
 router.use('/resources', resourcesRoutes);
 router.use('/ocr', ocrRoutes);
 router.use('/classBatches', classBatchRoutes);
+router.use('/bookings', bookingRoutes);
 
 module.exports = router;

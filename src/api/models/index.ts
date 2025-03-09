@@ -8,3 +8,4 @@ export const RefreshToken = require('./refreshToken.model');
 export const ReviewsRatings = require('./reviewsRatings.model');
 export const StaticData = require('./staticData.model');
 export const Student = require('./student.model');
+export const Booking = require('./booking.model');
