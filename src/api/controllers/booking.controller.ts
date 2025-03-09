@@ -156,7 +156,7 @@ exports.getBooking = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       data: {
-        ...booking,
+        booking,
         teacher,
         student,
         parent,
