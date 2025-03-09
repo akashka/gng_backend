@@ -66,7 +66,7 @@ exports.createStudent = async (req: Request, res: Response, next: NextFunction) 
       userRole: 'student',
       userName: req.body.name,
       isActive: true,
-      email: req.body.name?.trim().toLowerCase() + '@test.com'
+      email: req.body.name?.trim().toLowerCase().replace(/ /g, '') + '@test.com'
     });
 
     const savedUser = await user.save();

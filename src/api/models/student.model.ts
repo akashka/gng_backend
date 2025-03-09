@@ -69,7 +69,8 @@ const ALLOWED_FIELDS = [
   'isActive',
   'recommendationIndex',
   'parentId',
-  'userId'
+  'userId',
+  'id'
 ];
 
 studentSchema.method({
