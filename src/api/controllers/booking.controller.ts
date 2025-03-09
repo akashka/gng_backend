@@ -148,9 +148,9 @@ exports.getBooking = async (req: Request, res: Response) => {
     console.log('teacher', JSON.stringify(booking.teacher));
     booking.student = await Student.findById(booking.studentId);
     console.log('student', JSON.stringify(booking.student));
-    booking.parent = await Parent.findById(booking.parentId);
+    booking.parent = await Parent.findOne({ userId: booking.parentId });
     console.log('parent', JSON.stringify(booking.parent));
-    booking.batch = await Parent.findById(booking.batchId);
+    booking.batch = await ClassBatch.findById(booking.batchId);
     console.log('batch', JSON.stringify(booking.batch));
 
     if (!booking) {
