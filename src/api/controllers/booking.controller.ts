@@ -144,13 +144,13 @@ exports.getBooking = async (req: Request, res: Response) => {
 
     const booking = await Booking.findById(id);
     console.log('booking', JSON.stringify(booking));
-    booking.teacher = await Teacher.findOne({ id: booking.teacherId });
+    booking.teacher = await Teacher.findById(booking.teacherId);
     console.log('teacher', JSON.stringify(booking.teacher));
-    booking.student = await Student.findOne({ id: booking.studentId });
+    booking.student = await Student.findById(booking.studentId);
     console.log('student', JSON.stringify(booking.student));
-    booking.parent = await Parent.findOne({ id: booking.parentId });
+    booking.parent = await Parent.findById(booking.parentId);
     console.log('parent', JSON.stringify(booking.parent));
-    booking.batch = await Parent.findOne({ id: booking.batchId });
+    booking.batch = await Parent.findById(booking.batchId);
     console.log('batch', JSON.stringify(booking.batch));
 
     if (!booking) {
