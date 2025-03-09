@@ -1,7 +1,7 @@
 export {};
 const express = require('express');
 const router = express.Router();
-const bookingController = require('../../controllers/bookingController');
+const bookingController = require('../../controllers/booking.controller');
 
 // Create booking - first stage
 router.post('/', bookingController.createBooking);
