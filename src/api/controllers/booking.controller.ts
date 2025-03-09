@@ -142,11 +142,16 @@ exports.getBooking = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const booking = await Booking.findById(id)
-      .populate('teacherId', 'name email profilePic qualifications experience')
-      .populate('studentId', 'name age grade school')
-      .populate('parentId', 'name email phone address')
-      .populate('batchId', 'name description days time subjects maximumStudents currentStudents');
+    const booking = await Booking.findById(id);
+    console.log('booking', JSON.stringify(booking));
+    booking.teacher = await Teacher.findOne({ id: booking.teacherId });
+    console.log('teacher', JSON.stringify(booking.teacher));
+    booking.student = await Student.findOne({ id: booking.studentId });
+    console.log('student', JSON.stringify(booking.student));
+    booking.parent = await Parent.findOne({ id: booking.parentId });
+    console.log('parent', JSON.stringify(booking.parent));
+    booking.batch = await Parent.findOne({ id: booking.batchId });
+    console.log('batch', JSON.stringify(booking.batch));
 
     if (!booking) {
       return res.status(404).json({ success: false, message: 'Booking not found' });
