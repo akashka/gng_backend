@@ -143,23 +143,25 @@ exports.getBooking = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const booking = await Booking.findById(id);
-    console.log('booking', JSON.stringify(booking));
-    booking.teacher = await Teacher.findById(booking.teacherId);
-    console.log('teacher', JSON.stringify(booking.teacher));
-    booking.student = await Student.findById(booking.studentId);
-    console.log('student', JSON.stringify(booking.student));
-    booking.parent = await Parent.findOne({ userId: booking.parentId });
-    console.log('parent', JSON.stringify(booking.parent));
-    booking.batch = await ClassBatch.findById(booking.batchId);
-    console.log('batch', JSON.stringify(booking.batch));
 
     if (!booking) {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
 
+    const teacher = await Teacher.findById(booking.teacherId);
+    const student = await Student.findById(booking.studentId);
+    const parent = await Parent.findOne({ userId: booking.parentId });
+    const batch = await ClassBatch.findById(booking.batchId);
+
     res.status(200).json({
       success: true,
-      data: booking
+      data: {
+        ...booking,
+        teacher,
+        student,
+        parent,
+        batch
+      }
     });
   } catch (error) {
     console.error('Error fetching booking:', error);
