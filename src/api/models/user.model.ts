@@ -83,7 +83,20 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
-const ALLOWED_FIELDS = ['id', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName', 'isActive', 'phone'];
+const ALLOWED_FIELDS = [
+  'id',
+  'email',
+  'picture',
+  'role',
+  'createdAt',
+  'userRole',
+  'userName',
+  'isActive',
+  'phone',
+  'student',
+  'teacher',
+  'parent'
+];
 
 /**
  * Add your
