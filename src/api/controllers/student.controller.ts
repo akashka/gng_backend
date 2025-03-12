@@ -150,32 +150,34 @@ exports.listStudents = async (req: Request, res: Response, next: NextFunction) =
 
     // Step 1: Fetch all students
     let students = await Student.find();
-    students.map(async (t: any) => {
-      const reviewsRatings = await ReviewsRatings.find({ foreignId: t.id });
-      t.rating = getAverageRating(reviewsRatings);
-    });
+
+    await Promise.all(
+      students.map(async (t: any) => {
+        const reviewsRatings = await ReviewsRatings.find({ foreignId: t.id });
+        t.rating = getAverageRating(reviewsRatings);
+      })
+    );
 
     if (isActive) {
-      students = students.filter((student: { isActive: Boolean }) => student.isActive === isActive);
+      students = students.filter((student: { isActive: boolean }) => student.isActive === isActive);
     }
 
     if (parentId) {
-      students = students.filter((student: { parentId: String }) => student.parentId === parentId);
+      students = students.filter((student: { parentId: string }) => student.parentId === parentId);
     }
 
     if (userId) {
-      students = students.filter((student: { userId: String }) => student.userId === userId);
+      students = students.filter((student: { userId: string }) => student.userId === userId);
     }
 
     // Step 2: Filter based on searchQuery
     if (searchQuery) {
-      students = students.filter((student: { name: string }) =>
-        student.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const query = String(searchQuery).toLowerCase();
+      students = students.filter((student: { name: string }) => student.name.toLowerCase().includes(query));
     }
 
     // Step 3: Apply additional filters
-    const filterStudents = (students: any[], filterKey: string, filterValues: string[]) => {
+    const filterStudents = (students: any[], filterKey: string, filterValues: string | string[] | undefined) => {
       if (filterValues) {
         const filterArray = Array.isArray(filterValues) ? filterValues : [filterValues];
         return students.filter((student) => filterArray.some((value) => student[filterKey].includes(value)));
@@ -188,8 +190,9 @@ exports.listStudents = async (req: Request, res: Response, next: NextFunction) =
 
     // Step 4: Sort students
     // To-Do: classesLength & prices needs to be added to be displayed
-    let sortKey = 'recommendationIndex';
-    let sortOrder = 'asc';
+    let sortKey: string = 'recommendationIndex';
+    let sortOrder: 'asc' | 'dec' = 'asc';
+
     students.sort((a: any, b: any) => {
       if (a[sortKey] < b[sortKey]) return sortOrder === 'asc' ? -1 : 1;
       if (a[sortKey] > b[sortKey]) return sortOrder === 'asc' ? 1 : -1;
@@ -214,7 +217,8 @@ exports.listStudents = async (req: Request, res: Response, next: NextFunction) =
 
     // Step 5: Paginate results
     const pageSize = 10;
-    const startIndex = (page - 1) * pageSize;
+    const pageNum = Number(page);
+    const startIndex = (pageNum - 1) * pageSize;
     const paginatedStudents = students.slice(startIndex, startIndex + pageSize);
 
     // Step 6: Transform and return results
