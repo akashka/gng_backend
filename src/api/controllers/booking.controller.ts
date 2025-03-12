@@ -223,22 +223,22 @@ exports.getBookingByFilters = async (req: Request, res: Response) => {
     console.log('bookings 1', JSON.stringify(bookings));
 
     if (teacherId) {
-      bookings = bookings.filter((b: any) => b.teacherId === teacherId);
+      bookings = bookings.filter((b: any) => b.teacherId.toString() === teacherId);
     }
     console.log('bookings 2', JSON.stringify(bookings));
 
     if (studentId) {
-      bookings = bookings.filter((b: any) => b.studentId === studentId);
+      bookings = bookings.filter((b: any) => b.studentId.toString() === studentId);
     }
     console.log('bookings 3', JSON.stringify(bookings));
 
     if (parentId) {
-      bookings = bookings.filter((b: any) => b.parentId === parentId);
+      bookings = bookings.filter((b: any) => b.parentId.toString() === parentId);
     }
     console.log('bookings 4', JSON.stringify(bookings));
 
     if (isActive) {
-      bookings = bookings.filter((b: any) => b.isActive === isActive);
+      bookings = bookings.filter((b: any) => b.isActive.toString() === isActive.toString());
     }
     console.log('bookings 5', JSON.stringify(bookings));
 
