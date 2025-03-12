@@ -158,38 +158,58 @@ exports.listStudents = async (req: Request, res: Response, next: NextFunction) =
       })
     );
 
-    if (isActive) {
-      students = students.filter((student: { isActive: boolean }) => student.isActive === isActive);
+    // Handle isActive filter with proper query param type handling
+    if (isActive !== undefined) {
+      const isActiveValue = isActive === 'true';
+      students = students.filter((student: { isActive: boolean }) => student.isActive === isActiveValue);
     }
 
-    if (parentId) {
-      students = students.filter((student: { parentId: string }) => student.parentId === parentId);
+    if (parentId !== undefined) {
+      const parentIdValue = String(parentId);
+      students = students.filter((student: { parentId: string }) => student.parentId === parentIdValue);
     }
 
-    if (userId) {
-      students = students.filter((student: { userId: string }) => student.userId === userId);
+    if (userId !== undefined) {
+      const userIdValue = String(userId);
+      students = students.filter((student: { userId: string }) => student.userId === userIdValue);
     }
 
     // Step 2: Filter based on searchQuery
-    if (searchQuery) {
+    if (searchQuery !== undefined) {
       const query = String(searchQuery).toLowerCase();
       students = students.filter((student: { name: string }) => student.name.toLowerCase().includes(query));
     }
 
     // Step 3: Apply additional filters
-    const filterStudents = (students: any[], filterKey: string, filterValues: string | string[] | undefined) => {
-      if (filterValues) {
-        const filterArray = Array.isArray(filterValues) ? filterValues : [filterValues];
+    // Helper function to convert query parameter to string array
+    const toStringArray = (param: any) => {
+      if (!param) return [];
+      if (Array.isArray(param)) {
+        return param.map((item) => String(item));
+      }
+      if (typeof param === 'string') {
+        return [param];
+      }
+      // Handle ParsedQs object
+      if (typeof param === 'object') {
+        return Object.values(param).map((item) => String(item));
+      }
+      return [];
+    };
+
+    // Fixed filter function with proper typing - accept the exact type from req.query
+    const filterStudents = (students: any[], filterKey: string, filterArray: Array<String>) => {
+      if (filterArray.length > 0) {
         return students.filter((student) => filterArray.some((value) => student[filterKey].includes(value)));
       }
       return students;
     };
 
-    students = filterStudents(students, 'educationBoard', boards);
-    students = filterStudents(students, 'educationClass', classes);
+    // Pass the query parameters directly to the filterStudents function
+    students = filterStudents(students, 'educationBoard', toStringArray(boards));
+    students = filterStudents(students, 'educationClass', toStringArray(classes));
 
     // Step 4: Sort students
-    // To-Do: classesLength & prices needs to be added to be displayed
     let sortKey: string = 'recommendationIndex';
     let sortOrder: 'asc' | 'dec' = 'asc';
 
@@ -199,12 +219,13 @@ exports.listStudents = async (req: Request, res: Response, next: NextFunction) =
       return 0;
     });
 
-    if (sortOptions) {
-      if (sortOptions === 'relevance') {
+    if (sortOptions !== undefined) {
+      const sortOptionValue = String(sortOptions);
+      if (sortOptionValue === 'relevance') {
         sortKey = 'recommendationIndex';
         sortOrder = 'asc';
       }
-      if (sortOptions === 'rating') {
+      if (sortOptionValue === 'rating') {
         sortKey = 'rating';
         sortOrder = 'dec';
       }
