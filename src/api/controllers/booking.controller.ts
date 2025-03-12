@@ -220,30 +220,37 @@ exports.getBookingByFilters = async (req: Request, res: Response) => {
     const { teacherId, studentId, parentId, batchId, status, subjects, boards, classes, isActive } = req.query;
 
     let bookings = await Booking.find();
+    console.log('bookings 1', JSON.stringify(bookings));
 
     if (teacherId) {
       bookings = bookings.filter((b: any) => b.teacherId === teacherId);
     }
+    console.log('bookings 2', JSON.stringify(bookings));
 
     if (studentId) {
       bookings = bookings.filter((b: any) => b.studentId === studentId);
     }
+    console.log('bookings 3', JSON.stringify(bookings));
 
     if (parentId) {
       bookings = bookings.filter((b: any) => b.parentId === parentId);
     }
+    console.log('bookings 4', JSON.stringify(bookings));
 
     if (isActive) {
       bookings = bookings.filter((b: any) => b.isActive === isActive);
     }
+    console.log('bookings 5', JSON.stringify(bookings));
 
     if (batchId) {
       bookings = bookings.filter((b: any) => b.batchId === batchId);
     }
+    console.log('bookings 6', JSON.stringify(bookings));
 
     if (status) {
       bookings = bookings.filter((b: any) => b.status === status);
     }
+    console.log('bookings 7', JSON.stringify(bookings));
 
     bookings.map(async (b: any) => {
       b.teacher = await Teacher.findById(b.teacherId);
@@ -251,6 +258,8 @@ exports.getBookingByFilters = async (req: Request, res: Response) => {
       b.parent = await Parent.findOne({ userId: b.parentId });
       b.batch = await ClassBatch.findById(b.batchId);
     });
+    console.log('bookings 8', JSON.stringify(bookings));
+
     res.status(200).json({
       success: true,
       count: bookings.length,
