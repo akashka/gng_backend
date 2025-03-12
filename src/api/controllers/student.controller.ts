@@ -144,37 +144,27 @@ exports.updateStudent = async (req: Request, res: Response, next: NextFunction) 
  * Get list of students
  * @public
  */
-exports.listStudents = async (
-  req: {
-    query: {
-      page?: 1 | undefined;
-      sortOptions: any;
-      searchQuery: any;
-      boards: any;
-      classes: any;
-      parentId: any;
-      isActive: Boolean;
-    };
-  },
-  res: Response,
-  next: NextFunction
-) => {
+exports.listStudents = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { page = 1, sortOptions, searchQuery, boards, classes, parentId, isActive } = req.query;
+    const { page = 1, sortOptions, searchQuery, boards, classes, parentId, isActive, userId } = req.query;
 
     // Step 1: Fetch all students
     let students = await Student.find();
-    students.map(async (t: { id: any; rating: number; isActive: any }) => {
+    students.map(async (t: any) => {
       const reviewsRatings = await ReviewsRatings.find({ foreignId: t.id });
       t.rating = getAverageRating(reviewsRatings);
     });
 
-    if (req.query.isActive) {
-      students = students.filter((student: { isActive: Boolean }) => student.isActive === req.query.isActive);
+    if (isActive) {
+      students = students.filter((student: { isActive: Boolean }) => student.isActive === isActive);
     }
 
-    if (req.query.parentId) {
-      students = students.filter((student: { parentId: String }) => student.parentId === req.query.parentId);
+    if (parentId) {
+      students = students.filter((student: { parentId: String }) => student.parentId === parentId);
+    }
+
+    if (userId) {
+      students = students.filter((student: { userId: String }) => student.userId === userId);
     }
 
     // Step 2: Filter based on searchQuery
