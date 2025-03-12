@@ -12,6 +12,9 @@ router.put('/stage-two/:id', bookingController.updateBookingStageTwo);
 // Update booking - third stage (payment and status)
 router.put('/stage-three/:id', bookingController.updateBookingStageThree);
 
+// Get bookings by filter
+router.get('/bookings', bookingController.getBookingByFilters);
+
 // Get all bookings (admin and teachers)
 router.get('/', bookingController.getAllBookings);
 

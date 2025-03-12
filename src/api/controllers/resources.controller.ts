@@ -2,30 +2,15 @@ export {};
 import { NextFunction, Request, Response, Router } from 'express';
 const mongoose = require('mongoose');
 const axios = require('axios');
+const Resources = require('../models/resources.model');
+const User = require('../models/user.model');
 
-const generateEducationalContent = async (
-  req: { body: { educationalBoard: any; educationalClass: any; educationalSubject: any; educationalTopic: any } },
-  res: {
-    status: (arg0: number) => {
-      (): any;
-      new (): any;
-      json: {
-        (arg0: {
-          success: boolean;
-          message?: string;
-          data?: { content: any; metadata: { class: any; subject: any; topic: any; generatedAt: string } };
-          error?: any;
-        }): any;
-        new (): any;
-      };
-    };
-  }
-) => {
+const generateEducationalContent = async (req: Request, res: Response) => {
   try {
-    const { educationalClass, educationalSubject, educationalTopic, educationalBoard } = req.body;
+    const { educationalClass, educationalSubject, educationalTopic, educationalBoard, userId } = req.body;
 
     // Validate required fields
-    if (!educationalClass || !educationalSubject || !educationalTopic || educationalBoard) {
+    if (!educationalClass || !educationalSubject || !educationalTopic || !educationalBoard || !userId) {
       return res.status(400).json({
         success: false,
         message: 'Missing required fields: Class, Subject, Board, or Topic'
@@ -71,17 +56,32 @@ const generateEducationalContent = async (
     // Process the response
     const generatedContent = response.data.content[0].text;
 
+    const resources = new Resources({
+      generatedContent,
+      educationalClass,
+      educationalTopic,
+      generatedAt: new Date().toISOString(),
+      educationalSubject,
+      educationalBoard,
+      userId
+    });
+
+    const savedResources = await resources.save();
+
     // Return the generated HTML content
     return res.status(200).json({
       success: true,
       data: {
         content: generatedContent,
         metadata: {
-          class: educationalClass,
-          subject: educationalSubject,
-          topic: educationalTopic,
-          generatedAt: new Date().toISOString()
-        }
+          educationalClass,
+          educationalTopic,
+          generatedAt: new Date().toISOString(),
+          educationalSubject,
+          educationalBoard,
+          userId
+        },
+        id: savedResources.id
       }
     });
 
@@ -96,6 +96,35 @@ const generateEducationalContent = async (
   }
 };
 
+const listResources = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = await Resources.find();
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data not found'
+      });
+    }
+
+    data.map(async (d: any) => {
+      d.user = await User.findById(d.userId);
+    });
+
+    return res.status(200).json({
+      success: true,
+      value: data
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: 'Internal server error',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
-  generateEducationalContent
+  generateEducationalContent,
+  listResources
 };

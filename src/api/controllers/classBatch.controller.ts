@@ -190,9 +190,6 @@ exports.getTeacherBatchesWithEnrollment = async (req: Request, res: Response, ne
 
     const classBatches = await ClassBatch.find({ teacherId }).lean().exec();
 
-    // You would add student enrollment status here from your enrollment model
-    // This is a placeholder for where you would integrate with your enrollment system
-
     res.status(200).json(classBatches);
   } catch (error) {
     console.error('Error fetching teacher batches with enrollment:', error);

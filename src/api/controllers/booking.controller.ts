@@ -122,6 +122,13 @@ exports.updateBookingStageThree = async (req: Request, res: Response) => {
 exports.getAllBookings = async (req: Request, res: Response) => {
   try {
     const bookings = await Booking.find();
+
+    bookings.map(async (b: any) => {
+      b.teacher = await Teacher.findById(b.teacherId);
+      b.student = await Student.findById(b.studentId);
+      b.parent = await Parent.findOne({ userId: b.parentId });
+      b.batch = await ClassBatch.findById(b.batchId);
+    });
     res.status(200).json({
       success: true,
       count: bookings.length,
@@ -200,6 +207,57 @@ exports.deleteBooking = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error deleting booking:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server Error',
+      error: error.message
+    });
+  }
+};
+
+exports.getBookingByFilters = async (req: Request, res: Response) => {
+  try {
+    const { teacherId, studentId, parentId, batchId, status, subjects, boards, classes, isActive } = req.query;
+
+    let bookings = await Booking.find();
+
+    if (teacherId) {
+      bookings = bookings.filter((b: any) => b.teacherId === teacherId);
+    }
+
+    if (studentId) {
+      bookings = bookings.filter((b: any) => b.studentId === studentId);
+    }
+
+    if (parentId) {
+      bookings = bookings.filter((b: any) => b.parentId === parentId);
+    }
+
+    if (isActive) {
+      bookings = bookings.filter((b: any) => b.isActive === isActive);
+    }
+
+    if (batchId) {
+      bookings = bookings.filter((b: any) => b.batchId === batchId);
+    }
+
+    if (status) {
+      bookings = bookings.filter((b: any) => b.status === status);
+    }
+
+    bookings.map(async (b: any) => {
+      b.teacher = await Teacher.findById(b.teacherId);
+      b.student = await Student.findById(b.studentId);
+      b.parent = await Parent.findOne({ userId: b.parentId });
+      b.batch = await ClassBatch.findById(b.batchId);
+    });
+    res.status(200).json({
+      success: true,
+      count: bookings.length,
+      data: bookings
+    });
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
     res.status(500).json({
       success: false,
       message: 'Server Error',

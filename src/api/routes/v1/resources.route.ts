@@ -7,5 +7,6 @@ const router = express.Router();
 const controller = require('../../controllers/resources.controller');
 
 router.route('/generateEducationalContent').post(controller.generateEducationalContent);
+router.get('/').post(controller.listResources);
 
 module.exports = router;
