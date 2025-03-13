@@ -8,12 +8,13 @@ import {
   Teachers,
   User,
   ReviewsRatings,
-  Questionpaper,
   Resources,
   StaticData,
-  RefreshToken,
-  Report as ExamReport
+  RefreshToken
 } from '../models/index';
+const models = require('../../../src/api/models/questionpaper.model');
+const { Question, QuestionPaper, Answer } = models;
+const ExamReport = models.Report;
 const APIError = require('../utils/APIError');
 const httpStatus = require('http-status');
 
@@ -268,7 +269,7 @@ const getAdminReports = async () => {
     { $group: { _id: null, total: { $sum: '$fees' } } }
   ]);
   const totalResources = await Resources.countDocuments();
-  const totalExamPapers = await Questionpaper.countDocuments();
+  const totalExamPapers = await QuestionPaper.countDocuments();
 
   // Complex Metrics for Admin
   const monthlyEarningsTrend = await Booking.aggregate([
