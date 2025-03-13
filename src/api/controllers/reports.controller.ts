@@ -24,13 +24,13 @@ export const getReports = async (req: Request, res: Response, next: NextFunction
 
     switch (role) {
       case 'teacher':
-        reports = await getTeacherReports(userId);
+        reports = await getTeacherReports(String(userId));
         break;
       case 'student':
-        reports = await getStudentReports(userId);
+        reports = await getStudentReports(String(userId));
         break;
       case 'parent':
-        reports = await getParentReports(userId);
+        reports = await getParentReports(String(userId));
         break;
       case 'admin':
       case 'superadmin':
