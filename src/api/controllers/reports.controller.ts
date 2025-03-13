@@ -49,7 +49,8 @@ export const getReports = async (req: Request, res: Response, next: NextFunction
 // Teacher-specific reports
 const getTeacherReports = async (teacherId: string) => {
   const totalClasses = await Booking.countDocuments({ teacherId, status: 'confirmed' });
-  const totalStudents = await Booking.distinct('studentId', { teacherId, status: 'confirmed' }).count();
+  const studentIds = await Booking.distinct('studentId', { teacherId, status: 'confirmed' });
+  const totalStudents = studentIds.length;
   const totalEarnings = await Booking.aggregate([
     { $match: { teacherId: new mongoose.Types.ObjectId(teacherId), status: 'paid' } },
     { $group: { _id: null, total: { $sum: '$fees' } } }
@@ -104,9 +105,9 @@ const getTeacherReports = async (teacherId: string) => {
     totalStudents,
     totalEarnings: totalEarnings.length > 0 ? totalEarnings[0].total : 0,
     averageRating: averageRating.length > 0 ? averageRating[0].average : 0,
-    classTrends, // Monthly trend of classes conducted
-    studentPerformance, // Average marks of students taught by the teacher
-    subjectWiseEarnings, // Earnings broken down by subject
+    classTrends,
+    studentPerformance,
+    subjectWiseEarnings,
     batchWisePerformance, // Performance of each batch
     suggestions: {
       popularSubjects: popularSubjects.map((sub: { _id: any }) => sub._id), // Top 3 popular subjects to focus on
@@ -118,7 +119,8 @@ const getTeacherReports = async (teacherId: string) => {
 // Student-specific reports
 const getStudentReports = async (studentId: string) => {
   const totalClassesAttended = await Booking.countDocuments({ studentId, status: 'confirmed' });
-  const totalTeachers = await Booking.distinct('teacherId', { studentId, status: 'confirmed' }).count();
+  const teacherIds = await Booking.distinct('teacherId', { studentId, status: 'confirmed' });
+  const totalTeachers = teacherIds.length;
   const totalFeesPaid = await Booking.aggregate([
     { $match: { studentId: new mongoose.Types.ObjectId(studentId), status: 'paid' } },
     { $group: { _id: null, total: { $sum: '$fees' } } }
@@ -138,7 +140,7 @@ const getStudentReports = async (studentId: string) => {
   ]);
 
   const teacherRatings = await ReviewsRatings.aggregate([
-    { $match: { foreignId: { $in: await Booking.distinct('teacherId', { studentId }) } } },
+    { $match: { foreignId: { $in: teacherIds } } },
     { $group: { _id: '$foreignId', averageRating: { $avg: '$rating' } } }
   ]);
 
