@@ -16,6 +16,7 @@ const resourcesRoutes = require('./resources.route');
 const ocrRoutes = require('./ocr.route');
 const classBatchRoutes = require('./classBatch.route');
 const bookingRoutes = require('./booking.route');
+const reportRoutes = require('./reports.route');
 
 const router = express.Router();
 
@@ -46,5 +47,6 @@ router.use('/resources', resourcesRoutes);
 router.use('/ocr', ocrRoutes);
 router.use('/classBatches', classBatchRoutes);
 router.use('/bookings', bookingRoutes);
+router.use('/reports', reportRoutes);
 
 module.exports = router;
