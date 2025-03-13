@@ -9,3 +9,7 @@ export const ReviewsRatings = require('./reviewsRatings.model');
 export const StaticData = require('./staticData.model');
 export const Student = require('./student.model');
 export const Booking = require('./booking.model');
+export const Resources = require('./resources.model');
+export const Question = require('./questionpaper.model');
+export const Answer = require('./questionpaper.model');
+export const Report = require('./questionpaper.model');
