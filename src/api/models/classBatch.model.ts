@@ -74,16 +74,7 @@ const ClassBatchSchema = new Schema(
     },
     lastEnrolDate: {
       type: Date,
-      required: true,
-      validate: {
-        validator: function (value: Date) {
-          // Ensure enrollment date is at least 7 days from today
-          const minDate = new Date();
-          minDate.setDate(minDate.getDate() + 6);
-          return value >= minDate;
-        },
-        message: 'Last enrollment date must be at least 7 days from today'
-      }
+      required: true
     },
     isActive: {
       type: Boolean,
