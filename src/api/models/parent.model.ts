@@ -104,7 +104,8 @@ const ALLOWED_FIELDS = [
   'panCardNumber',
   'isActive',
   'recommendationIndex',
-  'userId'
+  'userId',
+  'id'
 ];
 
 parentSchema.method({
