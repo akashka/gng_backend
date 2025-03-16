@@ -1,20 +1,22 @@
-export {};
-import { NextFunction, Request, Response, Router } from 'express';
-const mongoose = require('mongoose');
-const axios = require('axios');
+import { NextFunction, Request, Response } from 'express';
+import { Anthropic } from '@anthropic-ai/sdk';
+import mongoose from 'mongoose';
+import axios from 'axios';
+
+// Import models with consistent import style
 const Resources = require('../models/resources.model');
 const User = require('../models/user.model');
-import { Anthropic } from '@anthropic-ai/sdk';
 
+// Create Anthropic client
 const anthropic = new Anthropic({
   apiKey: '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'
 });
 
 async function generateContent(
-  educationalSubject: any,
-  educationalBoard: any,
-  educationalClass: any,
-  educationalTopic: any
+  educationalSubject: string,
+  educationalBoard: string,
+  educationalClass: string,
+  educationalTopic: string
 ) {
   const prompt = `Can you generate a nice educational content for ${educationalSubject} subject ${educationalBoard} board India for class ${educationalClass} on the topic ${educationalTopic}. This has to be like educational content which kids when sees or read can understand the topic. Use images, videos, and text and keep it nice trendy readable fun interactive. No limit on content length take your own space. Use audio text videos animations. I WANT THE COMPLETE DATA IN THE HTML SYNTAX SO THAT I CAN JUST DANGEROUSLY RENDER IT WITHIN MY REACT NATIVE CODE FOR THE USER. ALL THE CSS STYLING MUST BE INLINE.
     Please ensure the content is:
@@ -42,10 +44,10 @@ async function generateContent(
       ]
     });
 
-    console.log('msg', msg);
+    console.log('msg', JSON.stringify(msg));
     return msg.content[0];
   } catch (error) {
-    console.error('Error generating content:', error);
+    console.error('Error in Claude API call:', error);
     throw error;
   }
 }
@@ -69,8 +71,9 @@ const generateEducationalContent = async (req: Request, res: Response) => {
       educationalClass,
       educationalTopic
     );
-    console.log('generatedContent', generatedContent);
+    console.log('generatedContent', JSON.stringify(generatedContent));
 
+    // Create new resource document
     const resources = new Resources({
       generatedContent,
       educationalClass,
@@ -81,6 +84,7 @@ const generateEducationalContent = async (req: Request, res: Response) => {
       userId
     });
 
+    // Save to database
     const savedResources = await resources.save();
 
     // Return the generated HTML content
@@ -99,7 +103,6 @@ const generateEducationalContent = async (req: Request, res: Response) => {
         id: savedResources.id
       }
     });
-
     console.log('generatedContent', JSON.stringify(generatedContent));
   } catch (error) {
     console.error('Error generating educational content:', error);
@@ -115,20 +118,27 @@ const listResources = async (req: Request, res: Response, next: NextFunction) =>
   try {
     const data = await Resources.find();
 
-    if (!data) {
+    if (!data || data.length === 0) {
       return res.status(404).json({
         success: false,
-        message: 'Data not found'
+        message: 'No resources found'
       });
     }
 
-    data.map(async (d: any) => {
-      d.user = await User.findById(d.userId);
-    });
+    // Use Promise.all for parallel user lookup
+    const resourcesWithUsers = await Promise.all(
+      data.map(async (resource: any) => {
+        const user = await User.findById(resource.userId);
+        return {
+          ...resource.toObject(),
+          user
+        };
+      })
+    );
 
     return res.status(200).json({
       success: true,
-      value: data
+      value: resourcesWithUsers
     });
   } catch (error) {
     return res.status(500).json({
@@ -139,7 +149,4 @@ const listResources = async (req: Request, res: Response, next: NextFunction) =>
   }
 };
 
-module.exports = {
-  generateEducationalContent,
-  listResources
-};
+export { generateEducationalContent, listResources };
