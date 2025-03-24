@@ -13,3 +13,4 @@ export const Resources = require('./resources.model');
 export const Question = require('./questionpaper.model');
 export const Answer = require('./questionpaper.model');
 export const Report = require('./questionpaper.model');
+export const Coupon = require('./coupons.model');
