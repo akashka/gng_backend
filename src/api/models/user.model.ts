@@ -14,7 +14,7 @@ const { env, JWT_SECRET, JWT_EXPIRATION_MINUTES } = require('../../config/vars')
 /**
  * User Roles
  */
-const roles = ['user', 'admin', 'teacher', 'parent', 'student'];
+const roles = ['user', 'admin', 'fullTime', 'contractor'];
 
 /**
  * User Schema
@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
     userRole: {
       type: String,
       enum: roles,
-      default: 'student'
+      default: 'contractor'
     },
     userName: {
       type: String,
@@ -83,20 +83,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true
   }
 );
-const ALLOWED_FIELDS = [
-  'id',
-  'email',
-  'picture',
-  'role',
-  'createdAt',
-  'userRole',
-  'userName',
-  'isActive',
-  'phone',
-  'student',
-  'teacher',
-  'parent'
-];
+const ALLOWED_FIELDS = ['id', 'email', 'picture', 'role', 'createdAt', 'userRole', 'userName', 'isActive', 'phone'];
 
 /**
  * Add your

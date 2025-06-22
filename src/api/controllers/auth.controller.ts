@@ -1,7 +1,7 @@
 export {};
 import { NextFunction, Request, Response, Router } from 'express';
 const httpStatus = require('http-status');
-import { User, Parent, Teachers, Student } from '../../api/models';
+import { User } from '../../api/models';
 const RefreshToken = require('../models/refreshToken.model');
 const moment = require('moment-timezone');
 import { apiJson, randomString, unionById } from '../../api/utils/Utils';
@@ -67,17 +67,6 @@ exports.login = async (req: Request, res: Response, next: NextFunction) => {
       slackWebhook(`User logged in: ${email} - IP: ${ip} - User Agent: ${headers['user-agent']}`);
     }
     const userTransformed = user.transform();
-
-    console.log('userTransformed 1', JSON.stringify(userTransformed));
-    if (userTransformed.role === 'student') {
-      userTransformed.student = await Student.find({ userId: userTransformed.id });
-    }
-    if (userTransformed.role === 'teacher') {
-      userTransformed.teacher = await Teachers.find({ userId: userTransformed.id });
-    }
-    if (userTransformed.role === 'parent') {
-      userTransformed.parent = await Parent.find({ userId: userTransformed.id });
-    }
 
     console.log('userTransformed 2', JSON.stringify(userTransformed));
     const data = { token, user: userTransformed };
