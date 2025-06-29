@@ -31,7 +31,7 @@ const locationSchema = new mongoose.Schema(
       type: String,
       required: [true, 'ZIP code is required'],
       trim: true,
-      match: [/^\d{5}(-\d{4})?$/, 'Please provide a valid ZIP code']
+      match: [/^\d{6}(-\d{4})?$/, 'Please provide a valid ZIP code']
     },
     country: {
       type: String,

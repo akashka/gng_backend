@@ -22,8 +22,8 @@ const employeeValidation = [
     .withMessage('Please provide a valid phone number'),
 
   body('aadhaar')
-    .matches(/^\d{4}-\d{4}-\d{4}$/)
-    .withMessage('Please provide a valid Aadhaar number (XXXX-XXXX-XXXX)'),
+    .matches(/^\d{12}/)
+    .withMessage('Please provide a valid Aadhaar number (XXXXXXXXXXXX)'),
 
   body('bloodGroup')
     .optional()

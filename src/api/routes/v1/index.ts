@@ -9,6 +9,7 @@ const staticDataRoutes = require('./staticData.route');
 const ocrRoutes = require('./ocr.route');
 const locationRoutes = require('./location.route');
 const employeeRoutes = require('./employee.route');
+const rateRoutes = require('./rates.route');
 
 const router = express.Router();
 
@@ -32,5 +33,6 @@ router.use('/staticdata', staticDataRoutes);
 router.use('/ocr', ocrRoutes);
 router.use('/locations', locationRoutes);
 router.use('/employees', employeeRoutes);
+router.use('/rates', rateRoutes);
 
 module.exports = router;
