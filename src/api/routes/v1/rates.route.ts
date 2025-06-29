@@ -10,7 +10,7 @@ const {
   updateRate,
   toggleRateStatus,
   deleteRate
-} = require('../controllers/rateController');
+} = require('../../controllers/rate.controller');
 
 // Validation rules
 const rateValidation = [
