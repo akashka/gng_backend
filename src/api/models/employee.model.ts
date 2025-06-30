@@ -139,20 +139,7 @@ const employeeSchema = new mongoose.Schema(
       trim: true
     },
     bankDetails: {
-      type: [bankDetailsSchema],
-      validate: {
-        validator: function (bankAccounts: any[]) {
-          // Ensure at least one bank account is provided
-          if (bankAccounts.length === 0) {
-            return false;
-          }
-
-          // Ensure only one primary account
-          const primaryAccounts = bankAccounts.filter((account) => account.isPrimary);
-          return primaryAccounts.length <= 1;
-        },
-        message: 'At least one bank account is required and only one can be set as primary'
-      }
+      type: [bankDetailsSchema]
     }
   },
   {
