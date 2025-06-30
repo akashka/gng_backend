@@ -43,11 +43,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // --- NOTE: for testing in DEV, allow Access-Control-Allow-Origin: (ref: https://goo.gl/pyjO1H)
-// app.all('/*', function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "X-Requested-With");
-//   next();
-// });
+app.all('/*', function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+  next();
+});
 
 app.use((req: any, res: express.Response, next: express.NextFunction) => {
   req.uuid = `uuid_${Math.random()}`; // use "uuid" lib
