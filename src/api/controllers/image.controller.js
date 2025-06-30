@@ -82,7 +82,9 @@ const imageController = {
       res.set({
         'Content-Type': image.contentType,
         'Content-Length': image.data.length,
-        'Cache-Control': 'public, max-age=31536000' // Cache for 1 year
+        'Cache-Control': 'public, max-age=31536000',
+        'Cross-Origin-Resource-Policy': 'cross-origin',
+        'Access-Control-Allow-Origin': '*'
       });
 
       // Send image data
