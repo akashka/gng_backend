@@ -1,8 +1,74 @@
 export {};
 const mongoose = require('mongoose');
 
+// Bank details sub-schema
+const bankDetailsSchema = new mongoose.Schema(
+  {
+    bankName: {
+      type: String,
+      required: [true, 'Bank name is required'],
+      trim: true,
+      maxLength: [100, 'Bank name cannot exceed 100 characters']
+    },
+    ifscCode: {
+      type: String,
+      required: [true, 'IFSC code is required'],
+      uppercase: true,
+      match: [/^[A-Z]{4}0[A-Z0-9]{6}$/, 'Please enter a valid IFSC code (e.g., SBIN0123456)']
+    },
+    accountHolderName: {
+      type: String,
+      required: [true, 'Account holder name is required'],
+      trim: true,
+      maxLength: [100, 'Account holder name cannot exceed 100 characters']
+    },
+    accountNumber: {
+      type: String,
+      required: [true, 'Account number is required'],
+      match: [/^\d{9,18}$/, 'Account number must be between 9-18 digits']
+    },
+    accountType: {
+      type: String,
+      enum: ['savings', 'current', 'salary'],
+      required: [true, 'Account type is required'],
+      default: 'savings'
+    },
+    upiId: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      match: [/^[\w.-]+@[\w.-]+$/, 'Please enter a valid UPI ID (e.g., user@paytm)'],
+      default: null
+    },
+    branchName: {
+      type: String,
+      trim: true,
+      maxLength: [100, 'Branch name cannot exceed 100 characters']
+    },
+    branchAddress: {
+      type: String,
+      trim: true,
+      maxLength: [200, 'Branch address cannot exceed 200 characters']
+    },
+    isPrimary: {
+      type: Boolean,
+      default: false
+    },
+    isActive: {
+      type: Boolean,
+      default: true
+    }
+  },
+  {
+    timestamps: true
+  }
+);
+
 const employeeSchema = new mongoose.Schema(
   {
+    profilePic: {
+      type: String
+    },
     name: {
       type: String,
       required: [true, 'Name is required'],
@@ -25,7 +91,7 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Aadhaar number is required'],
       unique: true,
-      match: [/^\d{4}-\d{4}-\d{4}$/, 'Please enter a valid Aadhaar number format (XXXX-XXXX-XXXX)']
+      match: [/^\d{12}$/, 'Please enter a valid Aadhaar number format (XXXX-XXXX-XXXX)']
     },
     bloodGroup: {
       type: String,
@@ -71,6 +137,22 @@ const employeeSchema = new mongoose.Schema(
     department: {
       type: String,
       trim: true
+    },
+    bankDetails: {
+      type: [bankDetailsSchema],
+      validate: {
+        validator: function (bankAccounts: any[]) {
+          // Ensure at least one bank account is provided
+          if (bankAccounts.length === 0) {
+            return false;
+          }
+
+          // Ensure only one primary account
+          const primaryAccounts = bankAccounts.filter((account) => account.isPrimary);
+          return primaryAccounts.length <= 1;
+        },
+        message: 'At least one bank account is required and only one can be set as primary'
+      }
     }
   },
   {
@@ -84,7 +166,22 @@ employeeSchema.pre('save', async function (next: () => void) {
     const count = await mongoose.model('Employee').countDocuments();
     this.employeeId = `EMP${String(count + 1).padStart(4, '0')}`;
   }
+
+  // Ensure at least one bank account is set as primary if multiple accounts exist
+  if (this.bankDetails && this.bankDetails.length > 0) {
+    const primaryAccounts = this.bankDetails.filter((account: any) => account.isPrimary);
+
+    // If no primary account is set, make the first one primary
+    if (primaryAccounts.length === 0) {
+      this.bankDetails[0].isPrimary = true;
+    }
+  }
+
   next();
 });
+
+// Index for better query performance
+employeeSchema.index({ 'bankDetails.accountNumber': 1 });
+employeeSchema.index({ 'bankDetails.ifscCode': 1 });
 
 module.exports = mongoose.model('Employee', employeeSchema);
