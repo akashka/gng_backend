@@ -36,7 +36,11 @@ app.use(methodOverride());
 app.use(helmet());
 
 // enable CORS - Cross Origin Resource Sharing
-app.use(cors());
+const corsOptions = {
+  origin: '*', // Add all allowed origins
+  credentials: false // Set to true if your requests include credentials (e.g., cookies, authorization headers)
+};
+app.use(cors(corsOptions));
 
 // --- NOTE: for testing in DEV, allow Access-Control-Allow-Origin: (ref: https://goo.gl/pyjO1H)
 // app.all('/*', function(req, res, next) {

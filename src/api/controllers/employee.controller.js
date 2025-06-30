@@ -128,7 +128,8 @@ const createEmployee = async (req, res) => {
       password: defaultPassword,
       role: 'employee',
       isActive: req.body.isActive !== undefined ? req.body.isActive : true,
-      employeeId: employee._id
+      employeeId: employee._id,
+      picture: req.body.profilePic
     });
 
     await user.save();
